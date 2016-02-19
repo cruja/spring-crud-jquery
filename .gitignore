@@ -1,0 +1,7 @@
+.springBeans
+/project
+/.idea
+/build
+/target
+*.log
+*.pdf
