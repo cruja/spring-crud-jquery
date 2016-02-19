@@ -1,0 +1,24 @@
+spring:
+  thymeleaf:
+    cache: false
+
+security:    
+  require-ssl: true    
+
+server:
+  port: 8443
+  ssl:
+    key-store: keystore
+    key-store-password: password
+    key-password: password
+    protocol: TLS
+    client-auth: WANT
+      
+    
+
+logging:
+  level:
+    org.springframework.web: INFO
+    org.hibernate: ERROR
+    
+  file: myapplication.log

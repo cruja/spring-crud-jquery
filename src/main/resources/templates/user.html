@@ -1,0 +1,82 @@
+<html>
+<head>
+	<script>
+	$(function() {
+		var dialog, form;
+		
+		function showResponse(responseText, statusText, xhr, $form)  {			
+			if (xhr.status == 206) {
+				$("#dialog-form").html(responseText);		
+			} else {
+				$("#dialog-form").dialog("close");
+			}	
+		}
+		$('#form-user').ajaxForm({success: showResponse}); 
+		 
+		dialog = $("#dialog-form").dialog({
+			autoOpen : false,
+			height : 350,
+			width : 450,
+			modal : true,
+			title: "Add/Edit users",
+			buttons : {
+				OK : function() {
+					$("#form-user").submit();
+				},
+				Close : function() {
+					dialog.dialog("close");
+				}
+			},
+			close : function() {
+				window.location.href=window.location.href;
+			}
+		});
+	});	
+	
+	</script>
+
+</head>
+<body>
+	<div th:fragment="create" id="dialog-form">
+		<form action="#" th:action="@{/users/}" th:object="${user}" method="post" enctype="multipart/form-data" id="form-user">
+		<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+			<table>
+				<tr>
+					<td>Name: <input type="hidden" th:field="*{id}" /></td>
+					<td><input type="text" th:field="*{name}" /></td>
+				</tr>
+				<tr >
+					<td bgcolor="red" colspan="2" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">name error</td>
+				</tr>
+				<tr>
+					<td>email:</td>
+					<td><input type="text" th:field="*{email}" /></td>
+				</tr>
+				<tr>
+					<td bgcolor="red" colspan="2" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">email error</td>
+				</tr>
+				<tr>
+					<td>password:</td>
+					<td><input type="password" th:field="*{password}" /></td>
+				</tr>
+				<tr>
+					<td bgcolor="red" colspan="2" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">password error</td>
+				</tr>
+				<tr>
+					<td>role:</td>
+					<td>
+					<select th:field="*{role}" >
+					  <option th:value="ADMIN" th:text="ADMIN"/>
+					  <option th:value="VIEWER" th:text="VIEWER"/>
+					  <option th:value="PUBLISHER" th:text="PUBLISHER"/>
+					</select>					
+					</td>
+				</tr>
+				<tr>
+					<td bgcolor="red" colspan="2" th:if="${#fields.hasErrors('role')}" th:errors="*{role}">role error</td>
+				</tr>
+			</table>
+		</form>
+	</div>
+</body>
+</html>

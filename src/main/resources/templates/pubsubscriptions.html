@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.10/css/jquery.dataTables.css" />
+<link rel="stylesheet" type="text/css" href="/css/my.css" />
+<link rel="stylesheet" type="text/css" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" />
+<script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script type="text/javascript" src="http://malsup.github.com/jquery.form.js"></script>
+<script type="text/javascript" src="//cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" th:src="@{/lib/jquery.spring-friendly.js}"></script>
+<script type="text/javascript" th:src="@{/js/includes.js}"></script>
+<script type="text/javascript" th:src="@{/js/pubsubscriptions.js}"></script>
+
+<title>my subscriptions</title>
+
+</head>
+<body>
+	<table id="pubsubscriptions" class="display">
+		<thead>
+			<tr>
+				<th>title</th>
+				<th>author</th>
+				<th>year</th>
+				<th>publisher</th>
+				<th>subscription</th>
+				<th>type</th>
+			</tr>
+		</thead>
+	</table>
+</body>
+</html>
