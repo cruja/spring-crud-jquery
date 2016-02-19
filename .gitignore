@@ -1,7 +1,8 @@
 .springBeans
 /project
-/.idea
-/build
-/target
+/spring-crud-jquery.iml
+/.idea/
+/build/
+/target/
 *.log
 *.pdf
