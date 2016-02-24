@@ -4,7 +4,7 @@ $(document).ready(function() {
 		updateEntity : function(id) {
 			// populate template; for new entry received id is 0.
 			url = (id != 0 ? "/" + id : "");
-			$.ajax({url: "/users" + url, contentType : "text/plain" , success: function(result){
+			$.ajax({url: "/users" + url, accepts:"text/plain, charset=utf-8", dataType: "text/plain", success: function(result){
 					$("#dialog-form").html(result);
 			}});
 			$('#dialog-form').dialog('open');
