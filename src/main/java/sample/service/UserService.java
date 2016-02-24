@@ -47,5 +47,14 @@ public class UserService {
 		return subscriptionRepository.findByUser(user);
 	}
 
+	public User createUserIfNotExist(String username, String password, User.Role role) {
+		User user = userRepository.findByEmail(username);
+		if (user == null) {
+			user = new User(null, username, username, password, role, User.Status.ACTIVE);
+			user.encodePassword(user.getPassword());
+			userRepository.save(user);
+		}
+		return user;
+	}
 
 }

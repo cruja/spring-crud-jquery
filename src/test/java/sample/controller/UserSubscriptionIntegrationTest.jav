@@ -38,7 +38,7 @@ import sample.valueobject.PublicationVO;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class, initializers = ConfigFileApplicationContextInitializer.class)
-@WebIntegrationTest({"server.port=8181", "management.port=8888"})
+@WebIntegrationTest({"server.port=8080", "management.port=8888"})
 public class UserSubscriptionIntegrationTest {
 
 	@Autowired

@@ -75,12 +75,12 @@ public class UserController {
 	}
 
 	
-	@RequestMapping(value = "/users/{id}", method = RequestMethod.GET, consumes = "text/plain; charset=UTF-8",  produces = "text/plain; charset=UTF-8")
-	public ModelAndView getUser(@Valid @PathVariable Long id) {			
+	@RequestMapping(value = "/users/{id}", method = RequestMethod.GET, produces = "text/plain; charset=utf-8")
+	public ModelAndView getUser(@Valid @PathVariable Long id) {
 		return new ModelAndView("user", "user", getUserAsJson(id));
 	}
 
-	@RequestMapping(value = "/users/{id}", method = RequestMethod.GET, consumes = "application/json; charset=UTF-8", produces="application/json; charset=UTF-8")
+	@RequestMapping(value = "/users/{id}", method = RequestMethod.GET, produces="application/json; charset=utf-8")
 	public User getUserAsJson(@Valid @PathVariable Long id) {
 		User user = userRepository.findOne(id);
 		

@@ -14,10 +14,12 @@ import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
 
 import sample.Application;
+import sample.Config;
 import sample.model.Publication;
 import sample.model.User;
 import sample.model.User.Role;
@@ -28,8 +30,8 @@ import sample.repository.UserRepository;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class, initializers = ConfigFileApplicationContextInitializer.class)
-//@ContextConfiguration(classes = Config.class, initializers = ConfigFileApplicationContextInitializer.class)
-//@WebIntegrationTest({"server.port=8080", "management.port=8888"})
+@ContextConfiguration(classes = Config.class, initializers = ConfigFileApplicationContextInitializer.class)
+@WebIntegrationTest({"server.port=8080", "management.port=8888"})
 public class PublicationTest {
 
 	@Autowired

@@ -28,6 +28,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().csrfTokenRepository(csrfTokenRepository());
+		//http.csrf().disable();
 		http.authorizeRequests().antMatchers("/", "/usersubscriptions/**").permitAll()
 		.anyRequest().authenticated()
 		.and().formLogin().loginPage("/login").permitAll().and().logout().permitAll();

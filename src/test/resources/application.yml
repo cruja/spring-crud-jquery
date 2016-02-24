@@ -1,0 +1,12 @@
+spring:
+  thymeleaf:
+    cache: false
+
+
+logging:
+  level:
+    org.springframework.web: INFO
+    org.springframework.security: DEBUG
+    org.hibernate: ERROR
+    
+  file: myapp-tests.log

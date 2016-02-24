@@ -2,17 +2,17 @@ spring:
   thymeleaf:
     cache: false
 
-security:    
-  require-ssl: true    
+#security:
+#  require-ssl: true
 
-server:
-  port: 8443
-  ssl:
-    key-store: keystore
-    key-store-password: password
-    key-password: password
-    protocol: TLS
-    client-auth: WANT
+#server:
+#  port: 8443
+#  ssl:
+#    key-store: keystore
+#    key-store-password: password
+#    key-password: password
+#    protocol: TLS
+#    client-auth: WANT
       
     
 

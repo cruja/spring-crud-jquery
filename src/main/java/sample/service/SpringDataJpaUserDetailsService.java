@@ -17,6 +17,7 @@ package sample.service;
 
 import java.util.stream.Collectors;
 
+import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Component;
 import sample.repository.UserRepository;
 
 @Component
+@Log4j
 public class SpringDataJpaUserDetailsService implements UserDetailsService {
 
 	private final UserRepository userRepository;
@@ -40,6 +42,7 @@ public class SpringDataJpaUserDetailsService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		sample.model.User user = this.userRepository.findByEmail(email);
+		log.info("@@@@@@@@@@@@@@@@@@@@@@@@@ requested user" + user);
 		if (user != null) {
 			//String[] roles = (String[]) user.getRoles().stream().map(r -> r.name()).collect(Collectors.toList()).toArray();
 			return new User(String.valueOf(user.getId()), user.getPassword(), user.isActive(), true, true, true,
