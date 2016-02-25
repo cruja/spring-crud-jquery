@@ -12,6 +12,7 @@ import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
 import org.springframework.http.*;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
 import sample.Application;
@@ -32,7 +33,8 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class, initializers = ConfigFileApplicationContextInitializer.class)
-@WebIntegrationTest({"server.port=8081", "management.port=8888"})
+@WebIntegrationTest({"server.port=0"})
+@DirtiesContext
 public class PublicationIntegrationTest {
 
     @Value("${local.server.port}")

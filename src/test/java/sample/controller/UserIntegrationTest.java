@@ -26,12 +26,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-//@SpringApplicationConfiguration(classes = Application.class, initializers = ConfigFileApplicationContextInitializer.class)
-//@ContextConfiguration(classes = Config.class, initializers = ConfigFileApplicationContextInitializer.class)
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class, initializers = ConfigFileApplicationContextInitializer.class)
-@WebIntegrationTest({"server.port=8081", "management.port=8888"})
+@WebIntegrationTest({"server.port=0"})
 @DirtiesContext
 public class UserIntegrationTest {
 

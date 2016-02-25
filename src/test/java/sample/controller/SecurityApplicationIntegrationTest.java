@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @WebAppConfiguration
-@IntegrationTest("server.port:8081")
+@IntegrationTest("server.port:0")
 @DirtiesContext
 public class SecurityApplicationIntegrationTest {
 
