@@ -49,26 +49,15 @@ public class UserTest {
 
 	private StatefullTestRestTemplate statefullTestRestTemplate = null;
 
-	public UserTest() {
-	}
-	@PostConstruct
-	public void init() {
-
-//		userRepository.deleteAll();
-		userService.createUserIfNotExist(userEmail, password, Role.ADMIN);
-		statefullTestRestTemplate = new StatefullTestRestTemplate("http://localhost:" + port,  "/login", userEmail, password);
-	}
-
 	@Before
 	public void setUp() {
 
-//		userRepository.deleteAll();
 		userService.createUserIfNotExist(userEmail, password, Role.ADMIN);
 		statefullTestRestTemplate = new StatefullTestRestTemplate("http://localhost:" + port,  "/login", userEmail, password);
 	}
 
 	@Test
-	public void givenRepositoryWhenSavedThenPersistedThenRemoved() {
+	public void givenRepositoryWhenSavedThenPersistedThanRemoved() {
 		long count = userRepository.count();
 		User user = new User(null, "view", "viewer@gmail.com", "password", Role.VIEWER, Status.ACTIVE);
 		userRepository.save(user);

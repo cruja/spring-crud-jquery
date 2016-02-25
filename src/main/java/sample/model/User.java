@@ -29,7 +29,7 @@ import lombok.ToString;
 @ToString(exclude = {"password"})
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = {"password"})
 @Entity
 public class User {
 	

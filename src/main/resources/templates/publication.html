@@ -39,10 +39,10 @@
 <body>
 	<div th:fragment="create" id="dialog-form">
 		<form action="#" th:action="@{/publications/}" th:object="${publication}" method="post" enctype="multipart/form-data" id="form-publication">
-		<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+			<input type="hidden" th:field="*{id}" />
 			<table>
 				<tr>
-					<td>Title: <input type="hidden" th:field="*{id}" /></td>
+					<td>Title:</td>
 					<td><input type="text" th:field="*{title}" /></td>
 				</tr>
 				<tr >

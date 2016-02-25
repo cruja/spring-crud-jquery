@@ -29,8 +29,6 @@ import sample.service.UserService;
 @PreAuthorize("hasAuthority('PUBLISHER') or hasAuthority('VIEWER')")
 public class SubscriptionController {
 
-
-
 	@Autowired
 	private SubscriptionRepository subscriptionRepository;
 
@@ -43,31 +41,16 @@ public class SubscriptionController {
 		return new ModelAndView("subscriptions");
 	}
 
-	/**
-	 * REST Controller returning {@link DataTablesOutput}
-	 */
-//	@JsonView(DataTablesOutput.View.class)
-//	@RequestMapping(value = "/data/subscriptions", method = RequestMethod.GET)
-//	public DataTablesOutput<Subscription> getSubscriptions(@Valid DataTablesInput input) {
-//		return subscriptionRepository.findAll(input);
-//	}
 
 	/**
-	 * REST Controller returning {@link DataTablesOutput}
+	 * REST Controller returning {@link DataTablesOutput} containing current user subscriptions
 	 */
 	@JsonView(DataTablesOutput.View.class)
 	@RequestMapping(value = "/data/usersubscriptions", method = RequestMethod.GET)
 	public DataTablesOutput<Subscription> getUserSubscriptons(@Valid DataTablesInput input, @AuthenticationPrincipal org.springframework.security.core.userdetails.User activeUser) {
 
 		User currentUser = userService.getActiveUser(activeUser);
-		Specification<Subscription> andUserSubscriptions = new Specification<Subscription>() {
-			@Override
-			public Predicate toPredicate(Root<Subscription> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-				return cb.equal(root.get("user"), currentUser);
-			}
-			
-		};
-		
+		Specification<Subscription> andUserSubscriptions = (root, query, cb) -> cb.equal(root.get("user"), currentUser);
 		return subscriptionRepository.findAll(input, andUserSubscriptions);
 	}
 

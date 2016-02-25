@@ -9,11 +9,11 @@
 	</parent>
 
 	<groupId>com.gss</groupId>
-	<artifactId>spring-crud-jquery</artifactId>
+	<artifactId>medical-jurnal</artifactId>
 	<version>1.0</version>
 
-	<name>Spring CRUD with JPA , DataTables, jQuery</name>
-	<description>Sample Spring CRUD Boot project with JPA , DataTables, jQuery </description>
+	<name>medical jurnal</name>
+	<description>Medical Jurnal with JPA , DataTables, jQuery </description>
 
 
 	<properties>

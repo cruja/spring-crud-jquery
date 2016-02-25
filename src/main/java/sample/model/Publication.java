@@ -10,15 +10,10 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import lombok.*;
 import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
 
 import com.fasterxml.jackson.annotation.JsonView;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
 /**
  * Publication model
@@ -26,7 +21,8 @@ import lombok.ToString;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude="publisher")
+@EqualsAndHashCode
+@ToString //(exclude="publisher")
 public class Publication implements UserEntity {
 
 	@Id

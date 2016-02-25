@@ -39,6 +39,11 @@ public class UserService {
 		return entity.isUserEntity(Long.valueOf(activeUser.getUsername()));
 	}
 
+	public User getCurrentUser(org.springframework.security.core.userdetails.User activeUser) {
+		return userRepository.findOne(Long.valueOf(activeUser.getUsername()));
+	}
+
+
 	public List<Subscription> getUserSubscriptions(Long userId) {
 
 		User user = userRepository.findOne(userId);

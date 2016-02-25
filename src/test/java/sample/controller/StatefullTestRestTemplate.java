@@ -13,6 +13,7 @@ import org.springframework.util.MultiValueMap;
 import sample.model.User;
 import sample.repository.UserRepository;
 
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -63,6 +64,11 @@ public class StatefullTestRestTemplate extends TestRestTemplate {
         return this.url + path;
     }
 
+    HttpHeaders setJsonRequstHeaders() {
+        reqHeaders.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        reqHeaders.setAcceptCharset(Arrays.asList(Charset.defaultCharset()));
+        return reqHeaders;
+    }
 
     private String getSessionCookie(ResponseEntity<String> responseEntity) {
         HttpHeaders responseHeaders = responseEntity.getHeaders();

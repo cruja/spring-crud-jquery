@@ -51,8 +51,8 @@ public class PublicationController {
 	private FileService fileService;
 
 	@RequestMapping(value = { "/publications" }, method = { RequestMethod.GET })
-	public ModelAndView addPublication() {
-		return new ModelAndView("publication", "publication", new Publication());
+	public ModelAndView addPublication(@AuthenticationPrincipal org.springframework.security.core.userdetails.User activeUser) {
+        return new ModelAndView("publication", "publication",  new Publication());
 	}
 	
 	@RequestMapping(value = { "/publications/" }, method = { RequestMethod.GET })
@@ -85,11 +85,17 @@ public class PublicationController {
 		return "redirect:/publications/";
 	}
 
-	@RequestMapping(value = "/publications/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/publications/{id}", method = RequestMethod.GET, produces = "text/plain; charset=utf-8")
 	public ModelAndView getPublication(@Valid @PathVariable Long id) {
 		Publication publication = publicationRepository.findOne(id);
 		return new ModelAndView("publication", "publication", publication);
 	}
+
+	@RequestMapping(value = "/publications/{id}", method = RequestMethod.GET, produces="application/json; charset=utf-8")
+	public Publication getPublicationAsJson(@Valid @PathVariable Long id) {
+		return publicationRepository.findOne(id);
+	}
+
 
 	@RequestMapping(value = "/publications/", method = RequestMethod.POST)
 	public ModelAndView updatePublication(@Valid Publication publication, BindingResult bindingResult,
@@ -102,21 +108,11 @@ public class PublicationController {
 			return new ModelAndView("publication", "publication", publication);
 		}
 		
-		if (publication.getId() != null) {
-			// security validation that current user is the owner for UPDATE
-			userService.validateIfEntityOwner(activeUser, publication);
-		}
-		
-		// logged user
-		User publisher = userRepository.findOne(Long.valueOf(activeUser.getUsername()));
-	
-		publication.setPublisher(publisher);
+        // current user become the publisher
+        publication.setPublisher(userService.getCurrentUser(activeUser));
 		publication = publicationRepository.save(publication);
-
-		fileService.storeFile(file, publication.getId());
+		fileService.storeFile(file.getBytes(), publication.getId());
 
 		return new ModelAndView("publication", "publication", new Publication());
 	}
-
-	
 }
