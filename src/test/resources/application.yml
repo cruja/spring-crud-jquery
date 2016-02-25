@@ -5,8 +5,10 @@ spring:
 
 logging:
   level:
+    org: INFO
+    org.springframework: INFO
     org.springframework.web: INFO
-    org.springframework.security: DEBUG
+    org.springframework.security: INFO
     org.hibernate: ERROR
     
   file: myapp-tests.log

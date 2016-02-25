@@ -25,25 +25,7 @@
 		<unit-tests.skip>false</unit-tests.skip>
 		<integration-tests.skip>true</integration-tests.skip>
 	</properties>
-<!--
-	<profiles>
-		<profile>
-			<id>integration</id>
-			<properties>
-				<unit-tests.skip>false</unit-tests.skip>
-				<integration-tests.skip>false</integration-tests.skip>
-			</properties>
-		</profile>
-		<profile>
-			<id>production</id>
-			<properties>
-				<unit-tests.skip>false</unit-tests.skip>
-				<integration-tests.skip>true</integration-tests.skip>
-			</properties>
-		</profile>
 
-	</profiles>
--->
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -179,7 +161,10 @@
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-					<skipTests>${unit-tests.skip}</skipTests>
+					<skipTests>false</skipTests>
+					<includes>
+						<include>**/*Test.java</include>
+					</includes>
 					<excludes>
 						<exclude>**/*IntegrationTest.java</exclude>
 					</excludes>
@@ -194,7 +179,7 @@
 							<goal>integration-test</goal>
 						</goals>
 						<configuration>
-							<skipTests>${integration-tests.skip}</skipTests>
+							<skipTests>false</skipTests>
 							<includes>
 								<include>**/*IntegrationTest.class</include>
 							</includes>

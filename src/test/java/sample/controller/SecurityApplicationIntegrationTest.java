@@ -34,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 @WebAppConfiguration
 @IntegrationTest("server.port:8081")
 @DirtiesContext
-public class SecurityApplicationTests {
+public class SecurityApplicationIntegrationTest {
 
     @Value("${local.server.port}")
     private int port;

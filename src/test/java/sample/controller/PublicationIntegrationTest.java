@@ -47,10 +47,6 @@ public class PublicationIntegrationTest {
 	@Autowired
 	private UserService userService;
 
-	@Autowired
-	//private SubscriptionRepository subscriptionRepository;
-
-
 	String userEmail =  "newPublisherIT@gmail.com";
 
     // statefull rest test connection

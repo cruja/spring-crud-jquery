@@ -18,6 +18,8 @@ spring:
 
 logging:
   level:
+    org: INFO
+    org.springframework: INFO
     org.springframework.web: INFO
     org.hibernate: ERROR
     

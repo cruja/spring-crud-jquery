@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 @SpringApplicationConfiguration(classes = Application.class, initializers = ConfigFileApplicationContextInitializer.class)
 @WebIntegrationTest({"server.port=8081", "management.port=8888"})
 @DirtiesContext
-public class UserTest {
+public class UserIntegrationTest {
 
     @Value("${local.server.port}")
     private int port;
