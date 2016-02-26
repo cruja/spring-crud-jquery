@@ -31,6 +31,7 @@ import sample.repository.SubscriptionRepository;
 import sample.repository.UserRepository;
 import sample.service.UserService;
 import sample.valueobject.PublicationSubscriptionVO;
+import sample.valueobject.PublicationVO;
 
 /**
  *
@@ -122,6 +123,15 @@ public class PubsubscriptionController {
 
 		subscriptionRepository.delete(subscriptionId);
 		response.sendRedirect("/pubsubscriptions/");
+	}
+
+	@RequestMapping(value = "/usersubscriptions/", method = RequestMethod.GET)
+	public List<PublicationVO> getSubscriedPublications(@AuthenticationPrincipal org.springframework.security.core.userdetails.User activeUser) {
+
+		List<Subscription> subscriptions = userService.getUserSubscriptions(Long.valueOf(activeUser.getUsername()));
+		return subscriptions.stream()
+				.map(s -> new PublicationVO(s.getPublication().getId(), s.getPublication().getTitle()))
+				.collect(Collectors.toList());
 	}
 
 }

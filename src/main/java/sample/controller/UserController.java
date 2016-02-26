@@ -29,8 +29,6 @@ import sample.repository.UserRepository;
 @PreAuthorize("hasAuthority('ADMIN')")
 public class UserController {
 
-
-
 	@Autowired
 	private UserRepository userRepository;
 

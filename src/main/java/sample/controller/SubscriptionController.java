@@ -57,13 +57,4 @@ public class SubscriptionController {
 		Specification<Subscription> andUserSubscriptions = (root, query, cb) -> cb.equal(root.get("user"), currentUser);
 		return subscriptionRepository.findAll(input, andUserSubscriptions);
 	}
-
-	@RequestMapping(value = "/usersubscriptions/", method = RequestMethod.GET)
-	public List<PublicationVO> getSubscriedPublications(@AuthenticationPrincipal org.springframework.security.core.userdetails.User activeUser) {
-
-		List<Subscription> subscriptions = userService.getUserSubscriptions(Long.valueOf(activeUser.getUsername()));
-		return subscriptions.stream()
-				.map(s -> new PublicationVO(s.getPublication().getId(), s.getPublication().getTitle()))
-				.collect(Collectors.toList());
-	}
 }

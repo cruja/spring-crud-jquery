@@ -1,10 +1,6 @@
 package sample.controller;
 
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
+import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.datatables.mapping.DataTablesInput;
 import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
@@ -13,23 +9,19 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
-
-import com.fasterxml.jackson.annotation.JsonView;
-
 import sample.model.Publication;
-import sample.model.User;
 import sample.repository.PublicationRepository;
 import sample.repository.SubscriptionRepository;
-import sample.repository.UserRepository;
+import sample.service.CryptoService;
 import sample.service.FileService;
 import sample.service.UserService;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.IOException;
 
 
 @RestController
@@ -44,10 +36,10 @@ public class PublicationController {
 	private SubscriptionRepository subscriptionRepository;
 
 	@Autowired
-	private UserRepository userRepository;
-
-	@Autowired
 	private UserService userService;
+
+    @Autowired
+    private CryptoService cryptoService;
 
 	@Autowired
 	private FileService fileService;
@@ -84,7 +76,6 @@ public class PublicationController {
 		
 		publicationRepository.delete(id);
 		response.sendRedirect("/publications/");
-		//return "redirect:/publications/";
 	}
 
 	@RequestMapping(value = "/publications/{id}", method = RequestMethod.GET, produces = "text/plain; charset=utf-8")
@@ -110,7 +101,7 @@ public class PublicationController {
 			return new ModelAndView("publication", "publication", publication);
 		}
 		
-        // current user become the publisher
+        // current user becomes the publisher
         publication.setPublisher(userService.getCurrentUser(activeUser));
 		publication = publicationRepository.save(publication);
 		fileService.storeFile(file.getBytes(), publication.getId());
@@ -120,14 +111,17 @@ public class PublicationController {
 
 
 	@RequestMapping(value ={"/publication/{publicationId}"}, method = RequestMethod.GET)
-	public HttpEntity<byte[]> getPublicationContent(@Valid @PathVariable Long publicationId) throws IOException {
+	public HttpEntity<byte[]> getPublicationContent(@Valid @PathVariable Long publicationId) throws IOException, CryptoService.CryptoException {
 
 		byte[] documentBody = fileService.getFileAsBytes(publicationId);
 
-		HttpHeaders header = prepareHttpHeaders();
-		header.setContentLength(documentBody.length);
+        // encrypt content
+        byte[] encryptedDocumentBody = cryptoService.encrypt("SECRET_KEY", documentBody);
 
-		return new HttpEntity<byte[]>(documentBody, header);
+		HttpHeaders header = prepareHttpHeaders();
+		header.setContentLength(encryptedDocumentBody.length);
+
+		return new HttpEntity<byte[]>(encryptedDocumentBody, header);
 
 	}
 

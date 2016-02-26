@@ -22,19 +22,20 @@ public class FileService {
 		this.storeFile(bytes, fileName);
 	}
 	
-	public void storeFile(byte[] bytes, String fileName) throws IOException {
+	private void storeFile(byte[] bytes, String fileName) throws IOException {
 		
 		log.debug(" storing file " + fileName);
 
-		BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(new File(fileName)));
-		stream.write(bytes);
-		stream.close();
-
+		try(BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(new File(fileName)))) {
+			stream.write(bytes);
+		}
 	}
 	
 	public byte[] getFileAsBytes(Long id) throws IOException {
 		String pathName = getPublicationLocalFileName(id);
-		return IOUtils.toByteArray(new FileInputStream(pathName));	
+		try(InputStream is = new FileInputStream(pathName)) {
+			return IOUtils.toByteArray(is);
+		}
 	}
 
 }

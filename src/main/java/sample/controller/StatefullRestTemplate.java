@@ -19,11 +19,8 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Created by cristi on 22/02/2016.
- */
 
-public class StatefullTestRestTemplate extends RestTemplate {
+public class StatefullRestTemplate extends RestTemplate {
 
     String url = null;
 
@@ -33,7 +30,7 @@ public class StatefullTestRestTemplate extends RestTemplate {
     @Getter
     private HttpHeaders reqHeaders = new HttpHeaders();
 
-    public StatefullTestRestTemplate(String url, String path, String username, String password) {
+    public StatefullRestTemplate(String url, String path, String username, String password) {
 
         super();
         this.url = url;
@@ -63,11 +60,11 @@ public class StatefullTestRestTemplate extends RestTemplate {
 
     }
 
-    String getUrl(String path) {
+    public String getUrl(String path) {
         return this.url + path;
     }
 
-    HttpHeaders setJsonRequstHeaders() {
+    public HttpHeaders setJsonRequstHeaders() {
         reqHeaders.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         reqHeaders.setAcceptCharset(Arrays.asList(Charset.defaultCharset()));
         return reqHeaders;

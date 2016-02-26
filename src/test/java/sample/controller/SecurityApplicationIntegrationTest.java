@@ -20,8 +20,6 @@ import sample.model.User;
 import sample.service.UserService;
 
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -42,16 +40,16 @@ public class SecurityApplicationIntegrationTest {
     @Autowired
     private UserService userService;
 
-    private StatefullTestRestTemplate statefullAdminRestTemplate = null;
-    private StatefullTestRestTemplate statefullViewerRestTemplate = null;
+    private StatefullRestTemplate statefullAdminRestTemplate = null;
+    private StatefullRestTemplate statefullViewerRestTemplate = null;
 
     @Before
     public void setUp() {
 
         userService.createUserIfNotExist("adminEmail@gm.com", "password", User.Role.ADMIN);
         userService.createUserIfNotExist("viewerEmail@gm.com", "password", User.Role.VIEWER);
-        statefullViewerRestTemplate = new StatefullTestRestTemplate("http://localhost:" + port,  "/login", "viewerEmail@gm.com", "password");
-        statefullAdminRestTemplate = new StatefullTestRestTemplate("http://localhost:" + port,  "/login", "adminEmail@gm.com", "password");
+        statefullViewerRestTemplate = new StatefullRestTemplate("http://localhost:" + port,  "/login", "viewerEmail@gm.com", "password");
+        statefullAdminRestTemplate = new StatefullRestTemplate("http://localhost:" + port,  "/login", "adminEmail@gm.com", "password");
     }
 
     @Test

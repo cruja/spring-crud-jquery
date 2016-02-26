@@ -9,7 +9,6 @@ import org.springframework.boot.test.*;
 import org.springframework.http.*;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 import sample.Application;
 //import sample.Config;
 import sample.model.User;
@@ -18,7 +17,6 @@ import sample.model.User.Status;
 import sample.repository.UserRepository;
 import sample.service.UserService;
 
-import javax.annotation.PostConstruct;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
@@ -44,13 +42,13 @@ public class UserIntegrationTest {
 	static String userEmail = "testadmin@gmail.com";
     static String password = "password";
 
-	private StatefullTestRestTemplate statefullTestRestTemplate = null;
+	private StatefullRestTemplate statefullRestTemplate = null;
 
 	@Before
 	public void setUp() {
 
 		userService.createUserIfNotExist(userEmail, password, Role.ADMIN);
-		statefullTestRestTemplate = new StatefullTestRestTemplate("http://localhost:" + port,  "/login", userEmail, password);
+		statefullRestTemplate = new StatefullRestTemplate("http://localhost:" + port,  "/login", userEmail, password);
 	}
 
 	@Test
@@ -71,13 +69,13 @@ public class UserIntegrationTest {
 		assertNotNull(user);
 		Long userId = user.getId();
 
-		String uri = statefullTestRestTemplate.getUrl("/users/" + userId);
+		String uri = statefullRestTemplate.getUrl("/users/" + userId);
 
-        HttpHeaders reqHeaders = statefullTestRestTemplate.getReqHeaders();
+        HttpHeaders reqHeaders = statefullRestTemplate.getReqHeaders();
         reqHeaders.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         reqHeaders.setAcceptCharset(Arrays.asList(Charset.defaultCharset()));
 
-		ResponseEntity<User> response = statefullTestRestTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Void>(reqHeaders), User.class);
+		ResponseEntity<User> response = statefullRestTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Void>(reqHeaders), User.class);
 		assertEquals(HttpStatus.OK,  response.getStatusCode());
 		User responseUser = response.getBody();
 
