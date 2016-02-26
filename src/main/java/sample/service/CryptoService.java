@@ -1,5 +1,6 @@
 package sample.service;
 
+import javassist.bytecode.ByteArray;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class CryptoService {
 
     private byte[] doCrypto(int cipherMode, String key, byte[] inputData) throws CryptoException {
         try {
+            //TODO pad key to 16 bytes! for AES algo
             Key secretKey = new SecretKeySpec(key.getBytes(), ALGORITHM);
             Cipher cipher = Cipher.getInstance(TRANSFORMATION);
             cipher.init(cipherMode, secretKey);

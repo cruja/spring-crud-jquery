@@ -1,18 +1,10 @@
 package sample.controller;
 
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.TestRestTemplate;
-import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.http.*;
-import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import sample.model.User;
-import sample.repository.UserRepository;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
