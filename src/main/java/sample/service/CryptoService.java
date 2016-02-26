@@ -1,6 +1,5 @@
 package sample.service;
 
-import javassist.bytecode.ByteArray;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;

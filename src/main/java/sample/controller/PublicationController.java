@@ -100,7 +100,7 @@ public class PublicationController {
 			response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
 			return new ModelAndView("publication", "publication", publication);
 		}
-		
+
         // current user becomes the publisher
         publication.setPublisher(userService.getCurrentUser(activeUser));
 		publication = publicationRepository.save(publication);
@@ -111,9 +111,15 @@ public class PublicationController {
 
 
 	@RequestMapping(value ={"/publication/{publicationId}"}, method = RequestMethod.GET)
-	public HttpEntity<byte[]> getPublicationContent(@Valid @PathVariable Long publicationId) throws IOException, CryptoService.CryptoException {
+	public HttpEntity<byte[]> getPublicationContent(@Valid @PathVariable Long publicationId, @AuthenticationPrincipal org.springframework.security.core.userdetails.User activeUser) throws IOException, CryptoService.CryptoException {
 
-		byte[] documentBody = fileService.getFileAsBytes(publicationId);
+        // security validation that current user is subscribed to the publication
+        Publication publication = publicationRepository.findOne(publicationId);
+        if(subscriptionRepository.countByUserAndPublication(userService.getCurrentUser(activeUser), publication) == 0) {
+            throw new SecurityException("not authorized - user " + activeUser.getUsername() + " not owner of publicationId: " + publicationId);
+        }
+
+        byte[] documentBody = fileService.getFileAsBytes(publicationId);
 
         // encrypt content
         byte[] encryptedDocumentBody = cryptoService.encrypt("MY SECRET KEY!!!", documentBody);

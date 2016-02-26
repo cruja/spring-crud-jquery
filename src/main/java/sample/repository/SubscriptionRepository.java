@@ -12,5 +12,6 @@ import sample.model.User;
 
 public interface SubscriptionRepository extends DataTablesRepository<Subscription, Long> {
 	public List<Subscription> findByUser(User user);
+	public long countByUserAndPublication(User user, Publication publication);
 	public void deleteByPublication(Publication publication);
 }

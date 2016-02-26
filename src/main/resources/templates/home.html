@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Welcome to medical journals</title>
+    <link rel="stylesheet" type="text/css" href="/css/my.css" />
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
+</head>
+<body>
+<div class="container">
+    <div class="navbar">
+        <div class="navbar-inner">
+            <ul class="nav">
+                <li><a th:href="@{/subscriptions/}" href="subscriptions.html"> subscriptions </a></li>
+                <li><a th:href="@{/publications/}" href="subscriptions.html"> publications </a></li>
+                <li><a th:href="@{/pubsubscriptions/}" href="pubsubscriptions.html"> pubsubscriptions </a></li>
+                <li><a th:href="@{/users/}" href="users.html"> users </a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+</body>
+</html>
