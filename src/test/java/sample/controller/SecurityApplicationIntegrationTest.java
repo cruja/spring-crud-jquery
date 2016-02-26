@@ -72,7 +72,7 @@ public class SecurityApplicationIntegrationTest {
         form.set("password", "password");
         ResponseEntity<String> entity = new TestRestTemplate().exchange(statefullAdminRestTemplate.getUrl("/login"), HttpMethod.POST,
                 new HttpEntity<MultiValueMap<String, String>>(form, headers),String.class);
-        assertEquals(HttpStatus.FORBIDDEN, entity.getStatusCode());
+        assertEquals(HttpStatus.FOUND, entity.getStatusCode());
     }
 
 
