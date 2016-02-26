@@ -25,10 +25,6 @@ public class UserService {
 		return getUserSubscriptions(Long.valueOf(activeUser.getUsername()));
 	}
 	
-	public User getActiveUser(org.springframework.security.core.userdetails.User activeUser) {
-		return userRepository.findOne(Long.valueOf(activeUser.getUsername()));
-	}
-	
 	public<T extends UserEntity> void validateIfEntityOwner (org.springframework.security.core.userdetails.User activeUser, T entity) {
 		if (!entity.isUserEntity(Long.valueOf(activeUser.getUsername()))) {
 			throw new SecurityException("not authorized (not owner of entity) for userId: " + activeUser.getUsername() +  " entity: " + entity);

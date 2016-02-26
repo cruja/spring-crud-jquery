@@ -55,23 +55,21 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/users/{id}/block", method = {RequestMethod.DELETE, RequestMethod.GET})
-	public String blockUser(@Valid @PathVariable Long id, @AuthenticationPrincipal org.springframework.security.core.userdetails.User activeUser, HttpServletResponse response) throws IOException {
+	public void blockUser(@Valid @PathVariable Long id, @AuthenticationPrincipal org.springframework.security.core.userdetails.User activeUser, HttpServletResponse response) throws IOException {
 		
 		User user = userRepository.findOne(id);
 		user.setStatus(Status.BLOCKED);
 		userRepository.save(user);
 		response.sendRedirect("/users/");
-		return "redirect:/users/";
 	}
 
 	@RequestMapping(value = "/users/{id}/activate", method = {RequestMethod.GET})
-	public String activateUser(@Valid @PathVariable Long id, @AuthenticationPrincipal org.springframework.security.core.userdetails.User activeUser, HttpServletResponse response) throws IOException {
+	public void activateUser(@Valid @PathVariable Long id, @AuthenticationPrincipal org.springframework.security.core.userdetails.User activeUser, HttpServletResponse response) throws IOException {
 		
 		User user = userRepository.findOne(id);
 		user.setStatus(Status.ACTIVE);
 		userRepository.save(user);
 		response.sendRedirect("/users/");
-		return "redirect:/users/";
 	}
 
 	

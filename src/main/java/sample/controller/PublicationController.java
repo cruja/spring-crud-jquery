@@ -8,6 +8,8 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.datatables.mapping.DataTablesInput;
 import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
@@ -70,7 +72,7 @@ public class PublicationController {
 	}
 
 	@RequestMapping(value = "/publications/{id}/delete", method = {RequestMethod.DELETE, RequestMethod.GET})
-	public String deletePublications(@Valid @PathVariable Long id, @AuthenticationPrincipal org.springframework.security.core.userdetails.User activeUser, HttpServletResponse response) throws IOException {
+	public void deletePublications(@Valid @PathVariable Long id, @AuthenticationPrincipal org.springframework.security.core.userdetails.User activeUser, HttpServletResponse response) throws IOException {
 		
 		Publication publication = publicationRepository.findOne(id);
 		
@@ -82,7 +84,7 @@ public class PublicationController {
 		
 		publicationRepository.delete(id);
 		response.sendRedirect("/publications/");
-		return "redirect:/publications/";
+		//return "redirect:/publications/";
 	}
 
 	@RequestMapping(value = "/publications/{id}", method = RequestMethod.GET, produces = "text/plain; charset=utf-8")
@@ -115,4 +117,26 @@ public class PublicationController {
 
 		return new ModelAndView("publication", "publication", new Publication());
 	}
+
+
+	@RequestMapping(value ={"/publication/{publicationId}"}, method = RequestMethod.GET)
+	public HttpEntity<byte[]> getPublicationContent(@Valid @PathVariable Long publicationId) throws IOException {
+
+		byte[] documentBody = fileService.getFileAsBytes(publicationId);
+
+		HttpHeaders header = prepareHttpHeaders();
+		header.setContentLength(documentBody.length);
+
+		return new HttpEntity<byte[]>(documentBody, header);
+
+	}
+
+	private HttpHeaders prepareHttpHeaders() {
+		HttpHeaders header = new HttpHeaders();
+		header.set("Content-Type", "application/pdf");
+		header.set("Accept-Ranges", "bytes");
+		return header;
+	}
+
+
 }

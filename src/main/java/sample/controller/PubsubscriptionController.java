@@ -104,10 +104,9 @@ public class PubsubscriptionController {
 
 	@RequestMapping(value = "/pubsubscriptions/{publicationId}/subscribe", method = RequestMethod.GET)
 	public void subscribe(@Valid @PathVariable Long publicationId,
-			@AuthenticationPrincipal org.springframework.security.core.userdetails.User activeUser,
-			HttpServletResponse response) throws IOException {
+			@AuthenticationPrincipal org.springframework.security.core.userdetails.User activeUser, HttpServletResponse response) throws IOException {
 
-		User viewer = userService.getActiveUser(activeUser);
+		User viewer = userService.getCurrentUser(activeUser);
 		Publication publication = publicationRepository.findOne(publicationId);
 		Subscription subscription = new Subscription(null, Subscription.Type.MONTHLY, LocalDate.now(), viewer, publication);
 		
@@ -116,7 +115,10 @@ public class PubsubscriptionController {
 	}
 
 	@RequestMapping(value = "/pubsubscriptions/{subscriptionId}/unsubscribe", method = RequestMethod.GET)
-	public void unsubscribe(@Valid @PathVariable Long subscriptionId, HttpServletResponse response) throws IOException {
+	public void unsubscribe(@Valid @PathVariable Long subscriptionId, @AuthenticationPrincipal org.springframework.security.core.userdetails.User activeUser, HttpServletResponse response) throws IOException {
+
+		// security validation that current user is the owner
+		userService.validateIfEntityOwner(activeUser, subscriptionRepository.findOne(subscriptionId));
 
 		subscriptionRepository.delete(subscriptionId);
 		response.sendRedirect("/pubsubscriptions/");

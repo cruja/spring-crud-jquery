@@ -19,7 +19,6 @@ import sample.service.SpringDataJpaUserDetailsService;
 @EnableWebSecurity
 @EnableWebMvcSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled =true)
-//@Profile("production")
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Autowired
@@ -29,7 +28,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().csrfTokenRepository(csrfTokenRepository());
 		//http.csrf().disable();
-		http.authorizeRequests().antMatchers("/", "/usersubscriptions/**").permitAll()
+		http.authorizeRequests().antMatchers("/").permitAll()
 		.anyRequest().authenticated()
 		.and().formLogin().loginPage("/login").permitAll().and().logout().permitAll();
 

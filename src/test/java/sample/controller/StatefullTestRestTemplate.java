@@ -10,6 +10,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 import sample.model.User;
 import sample.repository.UserRepository;
 
@@ -22,12 +23,12 @@ import java.util.regex.Pattern;
  * Created by cristi on 22/02/2016.
  */
 
-public class StatefullTestRestTemplate extends TestRestTemplate {
+public class StatefullTestRestTemplate extends RestTemplate {
 
     String url = null;
 
     @Getter
-    private TestRestTemplate statefullRestTemaplate = null;
+    private RestTemplate statefullRestTemaplate = null;
 
     @Getter
     private HttpHeaders reqHeaders = new HttpHeaders();
@@ -45,11 +46,13 @@ public class StatefullTestRestTemplate extends TestRestTemplate {
         form.set("username", username);
         form.set("password", password);
 
-        // cover both form and basic authentication
-        statefullRestTemaplate = new TestRestTemplate(username, password);
+
+        statefullRestTemaplate = new RestTemplate();
+
+        //request CSRF
         ResponseEntity<String> page = statefullRestTemaplate.getForEntity(getUrl(path), String.class);
 
-        //store first the csrf token
+        //store the csrf token
         form.set("_csrf", getCsrf(page));
         headers.set("Cookie",  getSessionCookie(page));
 

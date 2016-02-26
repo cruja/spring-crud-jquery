@@ -24,6 +24,10 @@ import sample.model.Subscription;
 import sample.model.User;
 import sample.repository.SubscriptionRepository;
 import sample.service.UserService;
+import sample.valueobject.PublicationVO;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @PreAuthorize("hasAuthority('PUBLISHER') or hasAuthority('VIEWER')")
@@ -37,7 +41,7 @@ public class SubscriptionController {
 
 	
 	@RequestMapping(value = { "/subscriptions/" }, method = { RequestMethod.GET })
-	public ModelAndView getPublications() {
+	public ModelAndView getSubscriptions() {
 		return new ModelAndView("subscriptions");
 	}
 
@@ -49,9 +53,17 @@ public class SubscriptionController {
 	@RequestMapping(value = "/data/usersubscriptions", method = RequestMethod.GET)
 	public DataTablesOutput<Subscription> getUserSubscriptons(@Valid DataTablesInput input, @AuthenticationPrincipal org.springframework.security.core.userdetails.User activeUser) {
 
-		User currentUser = userService.getActiveUser(activeUser);
+		User currentUser = userService.getCurrentUser(activeUser);
 		Specification<Subscription> andUserSubscriptions = (root, query, cb) -> cb.equal(root.get("user"), currentUser);
 		return subscriptionRepository.findAll(input, andUserSubscriptions);
 	}
 
+	@RequestMapping(value = "/usersubscriptions/", method = RequestMethod.GET)
+	public List<PublicationVO> getSubscriedPublications(@AuthenticationPrincipal org.springframework.security.core.userdetails.User activeUser) {
+
+		List<Subscription> subscriptions = userService.getUserSubscriptions(Long.valueOf(activeUser.getUsername()));
+		return subscriptions.stream()
+				.map(s -> new PublicationVO(s.getPublication().getId(), s.getPublication().getTitle()))
+				.collect(Collectors.toList());
+	}
 }

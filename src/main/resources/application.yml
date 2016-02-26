@@ -22,5 +22,5 @@ logging:
     org.springframework: INFO
     org.springframework.web: INFO
     org.hibernate: ERROR
-    
+    sample: DEBUG
   file: myapplication.log
