@@ -116,7 +116,7 @@ public class PublicationController {
 		byte[] documentBody = fileService.getFileAsBytes(publicationId);
 
         // encrypt content
-        byte[] encryptedDocumentBody = cryptoService.encrypt("SECRET_KEY", documentBody);
+        byte[] encryptedDocumentBody = cryptoService.encrypt("MY SECRET KEY!!!", documentBody);
 
 		HttpHeaders header = prepareHttpHeaders();
 		header.setContentLength(encryptedDocumentBody.length);
