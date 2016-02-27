@@ -39,16 +39,15 @@ public class UserIntegrationTest {
     @Autowired
     private UserService userService;
 
-	static String userEmail = "testadmin@gmail.com";
-    static String password = "password";
-
+	User admin = null;
 	private StatefullRestTemplate statefullRestTemplate = null;
 
 	@Before
 	public void setUp() {
 
-		userService.createUserIfNotExist(userEmail, password, Role.ADMIN);
-		statefullRestTemplate = new StatefullRestTemplate("http://localhost:" + port,  "/login", userEmail, password);
+		String userEmail = "testadmin@gmail.com";
+		admin = userService.createUserIfNotExist(userEmail, "password", Role.ADMIN);
+		statefullRestTemplate = new StatefullRestTemplate("http://localhost:" + port,  "/login", userEmail, "password");
 	}
 
 	@Test
@@ -65,10 +64,7 @@ public class UserIntegrationTest {
 	@Test
 	public void givenUserWhenEntityRequestedThenReturned() {
 
-		User user = userRepository.findByEmail(userEmail);
-		assertNotNull(user);
-		Long userId = user.getId();
-
+		Long userId = admin.getId();
 		String uri = statefullRestTemplate.getUrl("/users/" + userId);
 
         HttpHeaders reqHeaders = statefullRestTemplate.getReqHeaders();
@@ -80,8 +76,8 @@ public class UserIntegrationTest {
 		User responseUser = response.getBody();
 
 		// clear passwd
-		user.setPassword(null);
-		assertEquals(user, responseUser);
+		admin.setPassword(null);
+		assertEquals(admin, responseUser);
 		
 	}
 }

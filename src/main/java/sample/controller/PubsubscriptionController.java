@@ -1,15 +1,6 @@
 package sample.controller;
 
-import java.io.IOException;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
+import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.datatables.mapping.DataTablesInput;
 import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
@@ -22,26 +13,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
-
-import com.fasterxml.jackson.annotation.JsonView;
-
 import sample.model.Publication;
 import sample.model.Subscription;
 import sample.model.User;
 import sample.repository.PublicationRepository;
 import sample.repository.SubscriptionRepository;
-import sample.repository.UserRepository;
 import sample.service.CryptoService;
 import sample.service.FileService;
 import sample.service.UserService;
 import sample.valueobject.PublicationSubscriptionVO;
-import sample.valueobject.PublicationVO;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  *
  */
 @RestController
-@PreAuthorize("hasAuthority('PUBLISHER') or hasAuthority('VIEWER')")
+@PreAuthorize("hasAuthority('VIEWER')")
 public class PubsubscriptionController {
 
 	@Autowired
@@ -53,13 +47,13 @@ public class PubsubscriptionController {
 	@Autowired
 	private UserService userService;
 
-	@Autowired
-	private CryptoService cryptoService;
+    @Autowired
+    private CryptoService cryptoService;
 
-	@Autowired
-	private FileService fileService;
+    @Autowired
+    private FileService fileService;
 
-	@RequestMapping(value = { "/pubsubscriptions/" }, method = { RequestMethod.GET })
+    @RequestMapping(value = { "/pubsubscriptions/" }, method = { RequestMethod.GET })
 	public ModelAndView getPublications() {
 		return new ModelAndView("pubsubscriptions");
 	}
@@ -134,42 +128,30 @@ public class PubsubscriptionController {
 		response.sendRedirect("/pubsubscriptions/");
 	}
 
-	@RequestMapping(value = "/usersubscriptions/", method = RequestMethod.GET)
-	public List<PublicationVO> getSubscriedPublications(@AuthenticationPrincipal org.springframework.security.core.userdetails.User activeUser) {
+    @RequestMapping(value ={"/pubsubscriptions/{publicationId}"}, method = RequestMethod.GET)
+    public HttpEntity<byte[]> getPublicationContent(@Valid @PathVariable Long publicationId, @AuthenticationPrincipal org.springframework.security.core.userdetails.User activeUser) throws IOException, CryptoService.CryptoException {
 
-		List<Subscription> subscriptions = userService.getUserSubscriptions(Long.valueOf(activeUser.getUsername()));
-		return subscriptions.stream()
-				.map(s -> new PublicationVO(s.getPublication().getId(), s.getPublication().getTitle()))
-				.collect(Collectors.toList());
-	}
+        // security validation that current user is subscribed to the publication
+        Publication publication = publicationRepository.findOne(publicationId);
+        if(subscriptionRepository.countByUserAndPublication(userService.getCurrentUser(activeUser), publication) == 0) {
+            throw new SecurityException("not authorized - user " + activeUser.getUsername() + " not owner of publicationId: " + publicationId);
+        }
 
-	@RequestMapping(value ={"/publication/{publicationId}"}, method = RequestMethod.GET)
-	public HttpEntity<byte[]> getPublicationContent(@Valid @PathVariable Long publicationId, @AuthenticationPrincipal org.springframework.security.core.userdetails.User activeUser) throws IOException, CryptoService.CryptoException {
+        byte[] documentBody = fileService.getFileAsBytes(publicationId);
 
-		// security validation that current user is subscribed to the publication
-		Publication publication = publicationRepository.findOne(publicationId);
-		if(subscriptionRepository.countByUserAndPublication(userService.getCurrentUser(activeUser), publication) == 0) {
-			throw new SecurityException("not authorized - user " + activeUser.getUsername() + " not owner of publicationId: " + publicationId);
-		}
+        // encrypt content
+        byte[] encryptedDocumentBody = cryptoService.encrypt(CryptoService.CRYPTO_KEY, documentBody);
 
-		byte[] documentBody = fileService.getFileAsBytes(publicationId);
+        HttpHeaders header = prepareHttpHeaders();
+        header.setContentLength(encryptedDocumentBody.length);
 
-		// encrypt content
-		byte[] encryptedDocumentBody = cryptoService.encrypt("MY SECRET KEY!!!", documentBody);
+        return new HttpEntity<byte[]>(encryptedDocumentBody, header);
+    }
 
-		HttpHeaders header = prepareHttpHeaders();
-		header.setContentLength(encryptedDocumentBody.length);
-
-		return new HttpEntity<byte[]>(encryptedDocumentBody, header);
-
-	}
-
-	private HttpHeaders prepareHttpHeaders() {
-		HttpHeaders header = new HttpHeaders();
-		header.set("Content-Type", "application/pdf");
-		header.set("Accept-Ranges", "bytes");
-		return header;
-	}
-
-
+    private HttpHeaders prepareHttpHeaders() {
+        HttpHeaders header = new HttpHeaders();
+        header.set("Content-Type", "application/pdf");
+        header.set("Accept-Ranges", "bytes");
+        return header;
+    }
 }

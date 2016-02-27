@@ -19,6 +19,9 @@ public class CryptoService {
     private static final String ALGORITHM = "AES";
     private static final String TRANSFORMATION = "AES";
 
+    //TODO use a dynamic generated key instead!
+    public static final String CRYPTO_KEY = "MY SECRET KEY!!!";
+
     public byte[] encrypt(String key,  byte[] inputData) throws CryptoException {
         return doCrypto(Cipher.ENCRYPT_MODE, key, inputData);
     }

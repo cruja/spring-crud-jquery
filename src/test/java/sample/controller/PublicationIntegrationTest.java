@@ -23,9 +23,11 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class, initializers = ConfigFileApplicationContextInitializer.class)
-@WebIntegrationTest({"server.port=0"})
+@WebIntegrationTest("server.port=0")
 @DirtiesContext
 public class PublicationIntegrationTest {
+
+    public static final String PUBLICATIONS_PATH = "/publications/";
 
     @Value("${local.server.port}")
     private int port;
@@ -39,14 +41,15 @@ public class PublicationIntegrationTest {
 	@Autowired
 	private UserService userService;
 
-	String userEmail =  "newPublisherIT@gmail.com";
+    User publisher = null;
+
 
     // statefull rest test connection
 	private StatefullRestTemplate statefullRestTemplate = null;
 
 	@Before
 	public void setUp() {
-
+        String userEmail =  "newPublisherIT@gmail.com";
 		User publisher = userService.createUserIfNotExist(userEmail, "password", Role.PUBLISHER);
 		statefullRestTemplate = new StatefullRestTemplate("http://localhost:" + port,  "/login", userEmail, "password");
         publicationRepository.save(new Publication(null, "publicationTitle", "publicationAuthor", 2011, publisher));
@@ -56,17 +59,11 @@ public class PublicationIntegrationTest {
 	@Test
 	public void givenPublicationWhenEntityRequestedThenReturned() {
 
-        User publisher = userRepository.findByEmail(userEmail);
-
         Publication publication = new Publication(null, "pubTitle", "pubAuthor", 2015, publisher);
         publicationRepository.save(publication);
         assertNotNull(publication.getId());
 
-//        Set<Publication> userPublications = publicationRepository.findByPublisher(publisher);
-//        Publication publication = userPublications.iterator().next();
-//  	assertNotNull(publication);
-
-        String uri = statefullRestTemplate.getUrl("/publications/" + publication.getId());
+        String uri = statefullRestTemplate.getUrl(PUBLICATIONS_PATH + publication.getId());
         HttpHeaders reqHeaders = statefullRestTemplate.setJsonRequstHeaders();
         ResponseEntity<Publication> response = statefullRestTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Void>(reqHeaders), Publication.class);
 		assertEquals(HttpStatus.OK,  response.getStatusCode());
@@ -77,7 +74,7 @@ public class PublicationIntegrationTest {
     @Test
     public void givenPublicationsWhenRequestedThenReturned() {
 
-        String uri = statefullRestTemplate.getUrl("/publications/");
+        String uri = statefullRestTemplate.getUrl(PUBLICATIONS_PATH);
         HttpHeaders reqHeaders = statefullRestTemplate.getReqHeaders();
         ResponseEntity<String> response = statefullRestTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Void>(reqHeaders), String.class);
         assertEquals(HttpStatus.OK,  response.getStatusCode());
@@ -88,13 +85,11 @@ public class PublicationIntegrationTest {
     @Test
     public void givenPublicationWhenEntityRemovedThenDeleted() {
 
-        User publisher = userRepository.findByEmail(userEmail);
-
         Publication publication = new Publication(null, "pubTitle", "pubAuthor", 2015, publisher);
         publicationRepository.save(publication);
         assertNotNull(publication.getId());
 
-        String uri = statefullRestTemplate.getUrl("/publications/" + publication.getId() + "/delete");
+        String uri = statefullRestTemplate.getUrl(PUBLICATIONS_PATH + publication.getId() + "/delete");
         HttpHeaders reqHeaders = statefullRestTemplate.getReqHeaders();
         ResponseEntity<String> response = statefullRestTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Void>(reqHeaders), String.class);
         assertEquals(HttpStatus.OK,  response.getStatusCode());
