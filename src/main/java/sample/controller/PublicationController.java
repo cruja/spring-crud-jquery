@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.datatables.mapping.DataTablesInput;
 import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import sample.model.Publication;
+import sample.model.Subscription;
+import sample.model.User;
 import sample.repository.PublicationRepository;
 import sample.repository.SubscriptionRepository;
 import sample.service.CryptoService;
@@ -25,7 +28,7 @@ import java.io.IOException;
 
 
 @RestController
-@PreAuthorize("hasAuthority('PUBLISHER') or hasAuthority('VIEWER')")
+@PreAuthorize("hasAuthority('PUBLISHER')")
 public class PublicationController {
 
 
@@ -37,9 +40,6 @@ public class PublicationController {
 
 	@Autowired
 	private UserService userService;
-
-    @Autowired
-    private CryptoService cryptoService;
 
 	@Autowired
 	private FileService fileService;
@@ -59,8 +59,11 @@ public class PublicationController {
 	 */
 	@JsonView(DataTablesOutput.View.class)
 	@RequestMapping(value = "/data/publications", method = RequestMethod.GET)
-	public DataTablesOutput<Publication> getPublications(@Valid DataTablesInput input) {
-		return publicationRepository.findAll(input);
+	public DataTablesOutput<Publication> getPublications(@Valid DataTablesInput input, @AuthenticationPrincipal org.springframework.security.core.userdetails.User activeUser) {
+
+		User currentUser = userService.getCurrentUser(activeUser);
+		Specification<Publication> andPublisherPublications = (root, query, cb) -> cb.equal(root.get("publisher"), currentUser);
+		return publicationRepository.findAll(input, andPublisherPublications);
 	}
 
 	@RequestMapping(value = "/publications/{id}/delete", method = {RequestMethod.DELETE, RequestMethod.GET})
@@ -101,42 +104,12 @@ public class PublicationController {
 			return new ModelAndView("publication", "publication", publication);
 		}
 
-        // current user becomes the publisher
+        // set current user is the publisher
         publication.setPublisher(userService.getCurrentUser(activeUser));
 		publication = publicationRepository.save(publication);
 		fileService.storeFile(file.getBytes(), publication.getId());
 
 		return new ModelAndView("publication", "publication", new Publication());
 	}
-
-
-	@RequestMapping(value ={"/publication/{publicationId}"}, method = RequestMethod.GET)
-	public HttpEntity<byte[]> getPublicationContent(@Valid @PathVariable Long publicationId, @AuthenticationPrincipal org.springframework.security.core.userdetails.User activeUser) throws IOException, CryptoService.CryptoException {
-
-        // security validation that current user is subscribed to the publication
-        Publication publication = publicationRepository.findOne(publicationId);
-        if(subscriptionRepository.countByUserAndPublication(userService.getCurrentUser(activeUser), publication) == 0) {
-            throw new SecurityException("not authorized - user " + activeUser.getUsername() + " not owner of publicationId: " + publicationId);
-        }
-
-        byte[] documentBody = fileService.getFileAsBytes(publicationId);
-
-        // encrypt content
-        byte[] encryptedDocumentBody = cryptoService.encrypt("MY SECRET KEY!!!", documentBody);
-
-		HttpHeaders header = prepareHttpHeaders();
-		header.setContentLength(encryptedDocumentBody.length);
-
-		return new HttpEntity<byte[]>(encryptedDocumentBody, header);
-
-	}
-
-	private HttpHeaders prepareHttpHeaders() {
-		HttpHeaders header = new HttpHeaders();
-		header.set("Content-Type", "application/pdf");
-		header.set("Accept-Ranges", "bytes");
-		return header;
-	}
-
 
 }

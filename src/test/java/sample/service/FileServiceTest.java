@@ -1,5 +1,6 @@
 package sample.service;
 
+import lombok.extern.log4j.Log4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class, initializers = ConfigFileApplicationContextInitializer.class)
+@Log4j
 public class FileServiceTest {
 
     @Autowired
@@ -27,11 +29,13 @@ public class FileServiceTest {
 
     @Before
     public void setUp() {
+        File baseFolder = new File(FileService.PUBLICATIONS_PATH);
+        baseFolder.mkdirs();
     }
 
     @Test
     public void testGetPublicationLocalFileName() {
-        assertEquals("./1.pdf", FileService.getPublicationLocalFileName((long)1));
+        assertEquals(FileService.PUBLICATIONS_PATH  + "1.pdf", FileService.getPublicationLocalFileName((long)1));
     }
 
     @Test

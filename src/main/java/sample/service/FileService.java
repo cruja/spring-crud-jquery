@@ -10,7 +10,7 @@ import java.io.*;
 @Service
 public class FileService {
 	
-	private static String PUBLICATIONS_PATH = "./";
+	static String PUBLICATIONS_PATH = "./content/";
 
 	public static String getPublicationLocalFileName(Long publicationId) {
 		return PUBLICATIONS_PATH + publicationId + ".pdf";

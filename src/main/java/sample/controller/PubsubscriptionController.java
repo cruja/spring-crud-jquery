@@ -13,6 +13,8 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.datatables.mapping.DataTablesInput;
 import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,6 +31,8 @@ import sample.model.User;
 import sample.repository.PublicationRepository;
 import sample.repository.SubscriptionRepository;
 import sample.repository.UserRepository;
+import sample.service.CryptoService;
+import sample.service.FileService;
 import sample.service.UserService;
 import sample.valueobject.PublicationSubscriptionVO;
 import sample.valueobject.PublicationVO;
@@ -49,6 +53,11 @@ public class PubsubscriptionController {
 	@Autowired
 	private UserService userService;
 
+	@Autowired
+	private CryptoService cryptoService;
+
+	@Autowired
+	private FileService fileService;
 
 	@RequestMapping(value = { "/pubsubscriptions/" }, method = { RequestMethod.GET })
 	public ModelAndView getPublications() {
@@ -133,5 +142,34 @@ public class PubsubscriptionController {
 				.map(s -> new PublicationVO(s.getPublication().getId(), s.getPublication().getTitle()))
 				.collect(Collectors.toList());
 	}
+
+	@RequestMapping(value ={"/publication/{publicationId}"}, method = RequestMethod.GET)
+	public HttpEntity<byte[]> getPublicationContent(@Valid @PathVariable Long publicationId, @AuthenticationPrincipal org.springframework.security.core.userdetails.User activeUser) throws IOException, CryptoService.CryptoException {
+
+		// security validation that current user is subscribed to the publication
+		Publication publication = publicationRepository.findOne(publicationId);
+		if(subscriptionRepository.countByUserAndPublication(userService.getCurrentUser(activeUser), publication) == 0) {
+			throw new SecurityException("not authorized - user " + activeUser.getUsername() + " not owner of publicationId: " + publicationId);
+		}
+
+		byte[] documentBody = fileService.getFileAsBytes(publicationId);
+
+		// encrypt content
+		byte[] encryptedDocumentBody = cryptoService.encrypt("MY SECRET KEY!!!", documentBody);
+
+		HttpHeaders header = prepareHttpHeaders();
+		header.setContentLength(encryptedDocumentBody.length);
+
+		return new HttpEntity<byte[]>(encryptedDocumentBody, header);
+
+	}
+
+	private HttpHeaders prepareHttpHeaders() {
+		HttpHeaders header = new HttpHeaders();
+		header.set("Content-Type", "application/pdf");
+		header.set("Accept-Ranges", "bytes");
+		return header;
+	}
+
 
 }
