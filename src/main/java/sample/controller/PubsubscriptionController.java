@@ -139,6 +139,7 @@ public class PubsubscriptionController {
 
         byte[] documentBody = fileService.getFileAsBytes(publicationId);
 
+        // TODO use a dynamic generated key
         // encrypt content
         byte[] encryptedDocumentBody = cryptoService.encrypt(CryptoService.CRYPTO_KEY, documentBody);
 
