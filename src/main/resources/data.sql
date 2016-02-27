@@ -7,5 +7,5 @@ insert into publication (title, author, year, user_id) values ('surgery professi
 insert into publication (title, author, year, user_id) values ('internal for dummies','doctor3', 2012, 3);
 
 insert into subscription (type, user_id, publication_id) values ('MONTHLY',2, 3);
-insert into subscription (type, user_id, publication_id) values ('YEARLY',2, 2);
+insert into subscription (type, user_id, publication_id) values ('YEARLY',3, 2);
 insert into subscription (type, user_id, publication_id) values ('MONTHLY',3, 3);
