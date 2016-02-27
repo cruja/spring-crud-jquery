@@ -50,7 +50,7 @@ public class PublicationIntegrationTest {
 	@Before
 	public void setUp() {
         String userEmail =  "newPublisherIT@gmail.com";
-		User publisher = userService.createUserIfNotExist(userEmail, "password", Role.PUBLISHER);
+		publisher = userService.createUserIfNotExist(userEmail, "password", Role.PUBLISHER);
 		statefullRestTemplate = new StatefullRestTemplate("http://localhost:" + port,  "/login", userEmail, "password");
         publicationRepository.save(new Publication(null, "publicationTitle", "publicationAuthor", 2011, publisher));
 	}
