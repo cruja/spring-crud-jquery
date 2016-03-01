@@ -28,12 +28,12 @@ public class CryptoTest {
     }
 
     @Test
-    public void givenContentWhenEncryptDecriptThenMach() throws CryptoService.CryptoException {
+    public void givenContentWhenEncryptDecryptThenMatch() throws CryptoService.CryptoException {
         String key = "MY SECRET KEY!!!";
         byte[] content = "MY_CONTENT_WHICH_NEED_TO_BE_ENCRYPTED".getBytes();
         byte[] encryptedContent = cryptoService.encrypt(key, content);
-        byte[] decriptedContent = cryptoService.decrypt(key, encryptedContent);
-        assertArrayEquals(content, decriptedContent);
+        byte[] decryptedContent = cryptoService.decrypt(key, encryptedContent);
+        assertArrayEquals(content, decryptedContent);
     }
 
 }
