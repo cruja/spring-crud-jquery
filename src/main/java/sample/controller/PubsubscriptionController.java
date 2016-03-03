@@ -20,6 +20,7 @@ import sample.repository.PublicationRepository;
 import sample.repository.SubscriptionRepository;
 import sample.service.CryptoService;
 import sample.service.FileService;
+import sample.service.PubsubscriptionService;
 import sample.service.UserService;
 import sample.valueobject.PublicationSubscriptionVO;
 
@@ -40,6 +41,9 @@ public class PubsubscriptionController {
 
 	@Autowired
 	private PublicationRepository publicationRepository;
+
+	@Autowired
+	private PubsubscriptionService pubsubscriptionService;
 
 	@Autowired
 	private SubscriptionRepository subscriptionRepository;
@@ -68,18 +72,18 @@ public class PubsubscriptionController {
 			@AuthenticationPrincipal org.springframework.security.core.userdetails.User activeUser) {
 
 		DataTablesOutput<Publication> publicationDTO = publicationRepository.findAll(input);
-
 		// viewer subscriptions
 		List<Subscription> subscriptions = userService.getUserSubscriptions(activeUser);
-		
-		Map<Long, Subscription> userSubscriptionsByPubId = subscriptions.stream().collect(
-				Collectors.toMap(s -> s.getPublication().getId(), s -> s));
 
-		DataTablesOutput<PublicationSubscriptionVO> pubSubscriptionDTO = buildPubSubcriptionDTO(publicationDTO,
-				userSubscriptionsByPubId);
+		Map<Long, Subscription> userSubscriptionsByPubId = pubsubscriptionService.getSubscriptionsMapByPublicationId(subscriptions);
+
+
+		DataTablesOutput<PublicationSubscriptionVO> pubSubscriptionDTO = buildPubSubcriptionDTO(publicationDTO, userSubscriptionsByPubId);
 		
 		return pubSubscriptionDTO;
 	}
+
+
 
 	/**
 	 * Build the PubSubscription DataTablesOutput, basically transforming Publication entities into PublicationSubscriptionVO and wrapping them back into DataTableOutput
@@ -96,11 +100,11 @@ public class PubsubscriptionController {
 		pubSubscriptionDTO.setError(publicationDTO.getError());
 		pubSubscriptionDTO.setRecordsFiltered(publicationDTO.getRecordsFiltered());
 		pubSubscriptionDTO.setRecordsTotal(publicationDTO.getRecordsTotal());
-		
+
 		List<PublicationSubscriptionVO> data = publicationDTO.getData().stream()
 				.map(p -> new PublicationSubscriptionVO(p, userSubscriptionsByPubId.get(p.getId())))
 				.collect(Collectors.toList());
-		
+
 		pubSubscriptionDTO.setData(data);
 
 		return pubSubscriptionDTO;

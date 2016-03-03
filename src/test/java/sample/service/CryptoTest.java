@@ -9,10 +9,6 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import sample.Application;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
