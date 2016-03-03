@@ -133,26 +133,24 @@ public class PubsubscriptionController {
 
         // security validation that current user is subscribed to the publication
         Publication publication = publicationRepository.findOne(publicationId);
-        if(subscriptionRepository.countByUserAndPublication(userService.getCurrentUser(activeUser), publication) == 0) {
-            throw new SecurityException("not authorized - user " + activeUser.getUsername() + " not owner of publicationId: " + publicationId);
-        }
+		Subscription subscription = subscriptionRepository.findByUserAndPublication(userService.getCurrentUser(activeUser), publication);
 
-        byte[] documentBody = fileService.getFileAsBytes(publicationId);
+		// security validation that current user is the owner
+		userService.validateIfEntityOwner(activeUser, subscription);
+
+		byte[] documentBody = fileService.getFileAsBytes(publicationId);
 
         // TODO use a dynamic generated key
         // encrypt content
         byte[] encryptedDocumentBody = cryptoService.encrypt(CryptoService.CRYPTO_KEY, documentBody);
-
-        HttpHeaders header = prepareHttpHeaders();
-        header.setContentLength(encryptedDocumentBody.length);
-
-        return new HttpEntity<byte[]>(encryptedDocumentBody, header);
+        return new HttpEntity<byte[]>(encryptedDocumentBody, prepareHttpHeaders(encryptedDocumentBody.length));
     }
 
-    private HttpHeaders prepareHttpHeaders() {
+    private HttpHeaders prepareHttpHeaders(long contentLength) {
         HttpHeaders header = new HttpHeaders();
         header.set("Content-Type", "application/pdf");
         header.set("Accept-Ranges", "bytes");
+		header.setContentLength(contentLength);
         return header;
     }
 }
