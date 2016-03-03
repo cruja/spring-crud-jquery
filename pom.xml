@@ -127,7 +127,7 @@
 						<configuration>
 							<classifier>client</classifier>
 							<includes>
-								<include>**/StatefullRestTemplate.class</include>
+								<include>**/StatefulRestTemplate.class</include>
 								<include>**/PublicationVO.class</include>
 								<include>**/CryptoService*</include>
 							</includes>

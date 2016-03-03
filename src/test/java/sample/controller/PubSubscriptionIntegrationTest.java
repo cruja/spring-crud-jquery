@@ -2,9 +2,6 @@ package sample.controller;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -13,12 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.http.*;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.web.client.RestTemplate;
 
 import sample.Application;
 import sample.model.Publication;
@@ -27,11 +22,9 @@ import sample.model.User;
 import sample.model.User.Role;
 import sample.repository.PublicationRepository;
 import sample.repository.SubscriptionRepository;
-import sample.repository.UserRepository;
 import sample.service.CryptoService;
 import sample.service.FileService;
 import sample.service.UserService;
-import sample.valueobject.PublicationVO;
 
 import static org.junit.Assert.*;
 
@@ -67,8 +60,8 @@ public class PubSubscriptionIntegrationTest {
     User viewer = null;
 
     // statefull rest test connection
-	private StatefullRestTemplate publisherStatefullRestTemplate = null;
-	private StatefullRestTemplate viewerStatefullRestTemplate = null;
+	private StatefulRestTemplate publisherStatefulRestTemplate = null;
+	private StatefulRestTemplate viewerStatefulRestTemplate = null;
 
 	/**
 	 * Insert sample data at the beginning of all tests
@@ -80,10 +73,10 @@ public class PubSubscriptionIntegrationTest {
         String viewerEmail =  "viewer@gmail.com";
 
         publisher = userService.createUserIfNotExist(publisherEmail, "password", Role.PUBLISHER);
-        publisherStatefullRestTemplate = new StatefullRestTemplate("http://localhost:" + port,  "/login", publisherEmail, "password");
+        publisherStatefulRestTemplate = new StatefulRestTemplate("http://localhost:" + port,  "/login", publisherEmail, "password");
 
         viewer = userService.createUserIfNotExist(viewerEmail, "password", Role.VIEWER);
-        viewerStatefullRestTemplate = new StatefullRestTemplate("http://localhost:" + port,  "/login", viewerEmail, "password");
+        viewerStatefulRestTemplate = new StatefulRestTemplate("http://localhost:" + port,  "/login", viewerEmail, "password");
  	}
 
 
@@ -94,17 +87,17 @@ public class PubSubscriptionIntegrationTest {
         Publication publication = new Publication(null,  "publicationTitle", "publicationAuthor", 2000, publisher);
         publicationRepository.save(publication);
 
-        String uri = viewerStatefullRestTemplate.getUrl(PUBSUBSCRIPTIONS_PATH + publication.getId() + "/subscribe");
-        HttpHeaders reqHeaders = viewerStatefullRestTemplate.getReqHeaders();
-        ResponseEntity<String> response = viewerStatefullRestTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Void>(reqHeaders), String.class);
+        String uri = viewerStatefulRestTemplate.getUrl(PUBSUBSCRIPTIONS_PATH + publication.getId() + "/subscribe");
+        HttpHeaders reqHeaders = viewerStatefulRestTemplate.getReqHeaders();
+        ResponseEntity<String> response = viewerStatefulRestTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Void>(reqHeaders), String.class);
 
         assertEquals(HttpStatus.OK,  response.getStatusCode());
         Subscription subscription = subscriptionRepository.findByUserAndPublication(viewer, publication);
         assertNotNull(subscription);
 
-        uri = viewerStatefullRestTemplate.getUrl(PUBSUBSCRIPTIONS_PATH + subscription.getId() + "/unsubscribe");
-        reqHeaders = viewerStatefullRestTemplate.getReqHeaders();
-        response = viewerStatefullRestTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Void>(reqHeaders), String.class);
+        uri = viewerStatefulRestTemplate.getUrl(PUBSUBSCRIPTIONS_PATH + subscription.getId() + "/unsubscribe");
+        reqHeaders = viewerStatefulRestTemplate.getReqHeaders();
+        response = viewerStatefulRestTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Void>(reqHeaders), String.class);
 
         assertEquals(HttpStatus.OK,  response.getStatusCode());
         assertEquals(0,  subscriptionRepository.countByUserAndPublication(viewer, publication));
@@ -120,9 +113,9 @@ public class PubSubscriptionIntegrationTest {
 
         byte[] content = "Sample content".getBytes();
         fileService.storeFile(content, publication.getId());
-        String uri = viewerStatefullRestTemplate.getUrl(PUBSUBSCRIPTIONS_PATH + publication.getId());
-        HttpHeaders reqHeaders = viewerStatefullRestTemplate.getReqHeaders();
-        ResponseEntity<byte[]> response = viewerStatefullRestTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Void>(reqHeaders), byte[].class);
+        String uri = viewerStatefulRestTemplate.getUrl(PUBSUBSCRIPTIONS_PATH + publication.getId());
+        HttpHeaders reqHeaders = viewerStatefulRestTemplate.getReqHeaders();
+        ResponseEntity<byte[]> response = viewerStatefulRestTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Void>(reqHeaders), byte[].class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertArrayEquals(cryptoService.encrypt(CryptoService.CRYPTO_KEY, content), response.getBody());

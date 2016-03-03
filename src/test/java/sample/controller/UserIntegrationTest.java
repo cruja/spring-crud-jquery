@@ -40,14 +40,14 @@ public class UserIntegrationTest {
     private UserService userService;
 
 	User admin = null;
-	private StatefullRestTemplate statefullRestTemplate = null;
+	private StatefulRestTemplate statefulRestTemplate = null;
 
 	@Before
 	public void setUp() {
 
 		String userEmail = "testadmin@gmail.com";
 		admin = userService.createUserIfNotExist(userEmail, "password", Role.ADMIN);
-		statefullRestTemplate = new StatefullRestTemplate("http://localhost:" + port,  "/login", userEmail, "password");
+		statefulRestTemplate = new StatefulRestTemplate("http://localhost:" + port,  "/login", userEmail, "password");
 	}
 
 	@Test
@@ -65,13 +65,13 @@ public class UserIntegrationTest {
 	public void givenUserWhenEntityRequestedThenReturned() {
 
 		Long userId = admin.getId();
-		String uri = statefullRestTemplate.getUrl("/users/" + userId);
+		String uri = statefulRestTemplate.getUrl("/users/" + userId);
 
-        HttpHeaders reqHeaders = statefullRestTemplate.getReqHeaders();
+        HttpHeaders reqHeaders = statefulRestTemplate.getReqHeaders();
         reqHeaders.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         reqHeaders.setAcceptCharset(Arrays.asList(Charset.defaultCharset()));
 
-		ResponseEntity<User> response = statefullRestTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Void>(reqHeaders), User.class);
+		ResponseEntity<User> response = statefulRestTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Void>(reqHeaders), User.class);
 		assertEquals(HttpStatus.OK,  response.getStatusCode());
 		User responseUser = response.getBody();
 

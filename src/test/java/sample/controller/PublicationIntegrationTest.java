@@ -45,13 +45,13 @@ public class PublicationIntegrationTest {
 
 
     // statefull rest test connection
-	private StatefullRestTemplate statefullRestTemplate = null;
+	private StatefulRestTemplate statefulRestTemplate = null;
 
 	@Before
 	public void setUp() {
         String userEmail =  "newPublisherIT@gmail.com";
 		publisher = userService.createUserIfNotExist(userEmail, "password", Role.PUBLISHER);
-		statefullRestTemplate = new StatefullRestTemplate("http://localhost:" + port,  "/login", userEmail, "password");
+		statefulRestTemplate = new StatefulRestTemplate("http://localhost:" + port,  "/login", userEmail, "password");
         publicationRepository.save(new Publication(null, "publicationTitle", "publicationAuthor", 2011, publisher));
 	}
 
@@ -63,9 +63,9 @@ public class PublicationIntegrationTest {
         publicationRepository.save(publication);
         assertNotNull(publication.getId());
 
-        String uri = statefullRestTemplate.getUrl(PUBLICATIONS_PATH + publication.getId());
-        HttpHeaders reqHeaders = statefullRestTemplate.setJsonRequstHeaders();
-        ResponseEntity<Publication> response = statefullRestTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Void>(reqHeaders), Publication.class);
+        String uri = statefulRestTemplate.getUrl(PUBLICATIONS_PATH + publication.getId());
+        HttpHeaders reqHeaders = statefulRestTemplate.setJsonRequstHeaders();
+        ResponseEntity<Publication> response = statefulRestTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Void>(reqHeaders), Publication.class);
 		assertEquals(HttpStatus.OK,  response.getStatusCode());
 		assertEquals(publication, response.getBody());
 		
@@ -74,9 +74,9 @@ public class PublicationIntegrationTest {
     @Test
     public void givenPublicationsWhenRequestedThenReturned() {
 
-        String uri = statefullRestTemplate.getUrl(PUBLICATIONS_PATH);
-        HttpHeaders reqHeaders = statefullRestTemplate.getReqHeaders();
-        ResponseEntity<String> response = statefullRestTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Void>(reqHeaders), String.class);
+        String uri = statefulRestTemplate.getUrl(PUBLICATIONS_PATH);
+        HttpHeaders reqHeaders = statefulRestTemplate.getReqHeaders();
+        ResponseEntity<String> response = statefulRestTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Void>(reqHeaders), String.class);
         assertEquals(HttpStatus.OK,  response.getStatusCode());
         assertTrue("Wrong body (title doesn't match):\n" + response.getBody(), response.getBody().contains("<title>Publications</title>"));
 
@@ -89,9 +89,9 @@ public class PublicationIntegrationTest {
         publicationRepository.save(publication);
         assertNotNull(publication.getId());
 
-        String uri = statefullRestTemplate.getUrl(PUBLICATIONS_PATH + publication.getId() + "/delete");
-        HttpHeaders reqHeaders = statefullRestTemplate.getReqHeaders();
-        ResponseEntity<String> response = statefullRestTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Void>(reqHeaders), String.class);
+        String uri = statefulRestTemplate.getUrl(PUBLICATIONS_PATH + publication.getId() + "/delete");
+        HttpHeaders reqHeaders = statefulRestTemplate.getReqHeaders();
+        ResponseEntity<String> response = statefulRestTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Void>(reqHeaders), String.class);
         assertEquals(HttpStatus.OK,  response.getStatusCode());
 
         assertNull(publicationRepository.findOne(publication.getId()));

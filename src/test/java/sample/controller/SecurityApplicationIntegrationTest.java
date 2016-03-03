@@ -40,25 +40,25 @@ public class SecurityApplicationIntegrationTest {
     @Autowired
     private UserService userService;
 
-    private StatefullRestTemplate statefullAdminRestTemplate = null;
-    private StatefullRestTemplate statefullViewerRestTemplate = null;
+    private StatefulRestTemplate statefulAdminRestTemplate = null;
+    private StatefulRestTemplate statefulViewerRestTemplate = null;
 
     @Before
     public void setUp() {
 
         userService.createUserIfNotExist("adminEmail@gm.com", "password", User.Role.ADMIN);
         userService.createUserIfNotExist("viewerEmail@gm.com", "password", User.Role.VIEWER);
-        statefullViewerRestTemplate = new StatefullRestTemplate("http://localhost:" + port,  "/login", "viewerEmail@gm.com", "password");
-        statefullAdminRestTemplate = new StatefullRestTemplate("http://localhost:" + port,  "/login", "adminEmail@gm.com", "password");
+        statefulViewerRestTemplate = new StatefulRestTemplate("http://localhost:" + port,  "/login", "viewerEmail@gm.com", "password");
+        statefulAdminRestTemplate = new StatefulRestTemplate("http://localhost:" + port,  "/login", "adminEmail@gm.com", "password");
     }
 
     @Test
     public void giveAuthUserThenReturnHomepage() throws Exception {
-        String uri = statefullAdminRestTemplate.getUrl("/");
+        String uri = statefulAdminRestTemplate.getUrl("/");
 
-        HttpHeaders reqHeaders = statefullAdminRestTemplate.getReqHeaders();
+        HttpHeaders reqHeaders = statefulAdminRestTemplate.getReqHeaders();
         reqHeaders.setAccept(Arrays.asList(MediaType.TEXT_HTML));
-        ResponseEntity<String> response = statefullAdminRestTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Void>(reqHeaders), String.class);
+        ResponseEntity<String> response = statefulAdminRestTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Void>(reqHeaders), String.class);
         assertEquals(HttpStatus.OK,  response.getStatusCode());
         assertTrue("Wrong body (title doesn't match):\n" + response.getBody(), response.getBody().contains("<title>Welcome"));
     }
@@ -70,7 +70,7 @@ public class SecurityApplicationIntegrationTest {
         MultiValueMap<String, String> form = new LinkedMultiValueMap<String, String>();
         form.set("username", "adminEmail@gm.com");
         form.set("password", "password");
-        ResponseEntity<String> entity = new TestRestTemplate().exchange(statefullAdminRestTemplate.getUrl("/login"), HttpMethod.POST,
+        ResponseEntity<String> entity = new TestRestTemplate().exchange(statefulAdminRestTemplate.getUrl("/login"), HttpMethod.POST,
                 new HttpEntity<MultiValueMap<String, String>>(form, headers),String.class);
         assertEquals(HttpStatus.FOUND, entity.getStatusCode());
     }
@@ -78,7 +78,7 @@ public class SecurityApplicationIntegrationTest {
 
     @Test
     public void givenNotAuthorizedThenRedirectToLogin() throws Exception {
-        ResponseEntity<String> response = statefullViewerRestTemplate.getForEntity(statefullAdminRestTemplate.getUrl("/users/"), String.class);
+        ResponseEntity<String> response = statefulViewerRestTemplate.getForEntity(statefulAdminRestTemplate.getUrl("/users/"), String.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertTrue("Wrong body (title doesn't match):\n" + response.getBody(), response.getBody().contains("<title>Welcome to"));
     }

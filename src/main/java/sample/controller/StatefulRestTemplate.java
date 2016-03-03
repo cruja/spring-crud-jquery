@@ -12,17 +12,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class StatefullRestTemplate extends RestTemplate {
+public class StatefulRestTemplate extends RestTemplate {
 
     String url = null;
 
     @Getter
-    private RestTemplate statefullRestTemaplate = null;
+    private RestTemplate statefulRestTemplate = null;
 
     @Getter
     private HttpHeaders reqHeaders = new HttpHeaders();
 
-    public StatefullRestTemplate(String url, String path, String username, String password) {
+    public StatefulRestTemplate(String url, String path, String username, String password) {
 
         super();
         this.url = url;
@@ -36,10 +36,10 @@ public class StatefullRestTemplate extends RestTemplate {
         form.set("password", password);
 
 
-        statefullRestTemaplate = new RestTemplate();
+        statefulRestTemplate = new RestTemplate();
 
         //request CSRF
-        ResponseEntity<String> page = statefullRestTemaplate.getForEntity(getUrl(path), String.class);
+        ResponseEntity<String> page = statefulRestTemplate.getForEntity(getUrl(path), String.class);
 
         //store the csrf token
         form.set("_csrf", getCsrf(page));
@@ -47,7 +47,7 @@ public class StatefullRestTemplate extends RestTemplate {
 
         //authenticate
         final HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(form, headers);
-        ResponseEntity<String> responseEntity = statefullRestTemaplate.exchange(getUrl(path), HttpMethod.POST, requestEntity, String.class);
+        ResponseEntity<String> responseEntity = statefulRestTemplate.exchange(getUrl(path), HttpMethod.POST, requestEntity, String.class);
         reqHeaders.set("Cookie",  getSessionCookie(responseEntity));
 
     }
