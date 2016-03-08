@@ -22,6 +22,7 @@ import sample.service.UserService;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -60,7 +61,7 @@ public class SecurityApplicationIntegrationTest {
         reqHeaders.setAccept(Arrays.asList(MediaType.TEXT_HTML));
         ResponseEntity<String> response = statefulAdminRestTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Void>(reqHeaders), String.class);
         assertEquals(HttpStatus.OK,  response.getStatusCode());
-        assertTrue("Wrong body (title doesn't match):\n" + response.getBody(), response.getBody().contains("<title>Welcome"));
+        assertTrue("Wrong body (title doesn't match):\n" + response.getBody(), response.getBody().contains("<title>Home"));
     }
 
     @Test
@@ -70,9 +71,10 @@ public class SecurityApplicationIntegrationTest {
         MultiValueMap<String, String> form = new LinkedMultiValueMap<String, String>();
         form.set("username", "adminEmail@gm.com");
         form.set("password", "password");
-        ResponseEntity<String> entity = new TestRestTemplate().exchange(statefulAdminRestTemplate.getUrl("/login"), HttpMethod.POST,
+        ResponseEntity<String> response = new TestRestTemplate().exchange(statefulAdminRestTemplate.getUrl("/users"), HttpMethod.POST,
                 new HttpEntity<MultiValueMap<String, String>>(form, headers),String.class);
-        assertEquals(HttpStatus.FOUND, entity.getStatusCode());
+        assertEquals(HttpStatus.FOUND, response.getStatusCode());
+        assertNull(response.getBody());
     }
 
 
@@ -80,7 +82,7 @@ public class SecurityApplicationIntegrationTest {
     public void givenNotAuthorizedThenRedirectToLogin() throws Exception {
         ResponseEntity<String> response = statefulViewerRestTemplate.getForEntity(statefulAdminRestTemplate.getUrl("/users/"), String.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertTrue("Wrong body (title doesn't match):\n" + response.getBody(), response.getBody().contains("<title>Welcome to"));
+        assertTrue("Wrong body (title doesn't match):\n" + response.getBody(), response.getBody().contains("<title>Login"));
     }
 
 }
