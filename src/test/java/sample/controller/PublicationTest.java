@@ -101,13 +101,4 @@ public class PublicationTest {
         Set<Publication> userPublications = publicationRepository.findByPublisher(publisher);
         assertTrue(userPublications.contains(publication));
     }
-
-    @Test
-    void givenPublicationWhenStoredThenPersisted() throws IOException {
-        // set current user is the publisher
-        Publication publication = new Publication(null, "pubTitle", "pubAuthor", 2015, publisher);
-        publication = publicationRepository.save(publication);
-        //TODO test transaction!
-        fileService.storeFile(file.getBytes(), publication.getId());
-    }
 }

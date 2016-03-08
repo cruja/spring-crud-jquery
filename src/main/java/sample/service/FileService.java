@@ -21,8 +21,8 @@ public class FileService {
 		String fileName = getPublicationLocalFileName(id);
 		this.storeFile(bytes, fileName);
 	}
-	
-	private void storeFile(byte[] bytes, String fileName) throws IOException {
+
+	public void storeFile(byte[] bytes, String fileName) throws IOException {
 		
 		log.debug(" storing file " + fileName);
 
@@ -33,6 +33,9 @@ public class FileService {
 	
 	public byte[] getFileAsBytes(Long id) throws IOException {
 		String pathName = getPublicationLocalFileName(id);
+		return getFileAsBytes(pathName);
+	}
+	public byte[] getFileAsBytes(String pathName) throws IOException {
 		try(InputStream is = new FileInputStream(pathName)) {
 			return IOUtils.toByteArray(is);
 		}

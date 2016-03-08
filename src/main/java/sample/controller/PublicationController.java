@@ -17,6 +17,7 @@ import sample.model.User;
 import sample.repository.PublicationRepository;
 import sample.repository.SubscriptionRepository;
 import sample.service.FileService;
+import sample.service.PubsubscriptionService;
 import sample.service.UserService;
 
 import javax.servlet.http.HttpServletResponse;
@@ -34,6 +35,9 @@ public class PublicationController {
 
 	@Autowired
 	private SubscriptionRepository subscriptionRepository;
+
+	@Autowired
+	private PubsubscriptionService pubsubscriptionService;
 
 	@Autowired
 	private UserService userService;
@@ -105,16 +109,12 @@ public class PublicationController {
 		}
 		// set current user is the publisher
 		publication.setPublisher(userService.getCurrentUser(activeUser));
-		storePublication(publication,file.getBytes());
 
+		pubsubscriptionService.storePublication(publication, file.getBytes());
 
 		return new ModelAndView("publication", "publication", new Publication());
 	}
 
-	@Transactional
-	void storePublication(@Valid Publication publication, byte[] content) throws IOException {
-		publication = publicationRepository.save(publication);
-		fileService.storeFile(content, publication.getId());
-	}
+
 
 }

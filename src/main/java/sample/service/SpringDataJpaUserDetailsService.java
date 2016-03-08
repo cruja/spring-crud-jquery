@@ -42,7 +42,7 @@ public class SpringDataJpaUserDetailsService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		sample.model.User user = this.userRepository.findByEmail(email);
-		log.info("@@@@@@@@@@@@@@@@@@@@@@@@@ requested user" + user);
+		log.info("@@@@@@@@@ requested user" + user);
 		if (user != null) {
 			//String[] roles = (String[]) user.getRoles().stream().map(r -> r.name()).collect(Collectors.toList()).toArray();
 			return new User(String.valueOf(user.getId()), user.getPassword(), user.isActive(), true, true, true,

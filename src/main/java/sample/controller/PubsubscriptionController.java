@@ -74,9 +74,7 @@ public class PubsubscriptionController {
 		DataTablesOutput<Publication> publicationDTO = publicationRepository.findAll(input);
 		// viewer subscriptions
 		List<Subscription> subscriptions = userService.getUserSubscriptions(activeUser);
-
 		Map<Long, Subscription> userSubscriptionsByPubId = pubsubscriptionService.getSubscriptionsMapByPublicationId(subscriptions);
-
 
 		DataTablesOutput<PublicationSubscriptionVO> pubSubscriptionDTO = buildPubSubcriptionDTO(publicationDTO, userSubscriptionsByPubId);
 		
