@@ -1,5 +1,6 @@
 package sample.controller;
 
+import lombok.extern.log4j.Log4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,11 +14,15 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import sample.Application;
 import sample.model.Publication;
+import sample.model.Subscription;
 import sample.model.User;
 import sample.model.User.Role;
 import sample.repository.PublicationRepository;
+import sample.repository.SubscriptionRepository;
 import sample.repository.UserRepository;
 import sample.service.UserService;
+
+import java.time.LocalDate;
 
 import static org.junit.Assert.*;
 
@@ -25,6 +30,7 @@ import static org.junit.Assert.*;
 @SpringApplicationConfiguration(classes = Application.class, initializers = ConfigFileApplicationContextInitializer.class)
 @WebIntegrationTest("server.port=0")
 @DirtiesContext
+@Log4j
 public class PublicationIntegrationTest {
 
     public static final String PUBLICATIONS_PATH = "/publications/";
@@ -35,14 +41,14 @@ public class PublicationIntegrationTest {
 	@Autowired
 	private PublicationRepository publicationRepository;
 
-	@Autowired
-	private UserRepository userRepository;
+    @Autowired
+    private SubscriptionRepository subscriptionRepository;
 
 	@Autowired
 	private UserService userService;
 
     User publisher = null;
-
+    User viewer = null;
 
     // statefull rest test connection
 	private StatefulRestTemplate statefulRestTemplate = null;
@@ -53,6 +59,9 @@ public class PublicationIntegrationTest {
 		publisher = userService.createUserIfNotExist(userEmail, "password", Role.PUBLISHER);
 		statefulRestTemplate = new StatefulRestTemplate("http://localhost:" + port,  "/login", userEmail, "password");
         publicationRepository.save(new Publication(null, "publicationTitle", "publicationAuthor", 2011, publisher));
+
+
+        viewer = userService.createUserIfNotExist( "viewer@gmail.com", "password", Role.VIEWER);
 	}
 
 
@@ -87,13 +96,19 @@ public class PublicationIntegrationTest {
 
         Publication publication = new Publication(null, "pubTitle", "pubAuthor", 2015, publisher);
         publicationRepository.save(publication);
+
+        Subscription subscription = new Subscription(null, Subscription.Type.MONTHLY, LocalDate.now(), viewer, publication);
+        subscriptionRepository.save(subscription);
+
         assertNotNull(publication.getId());
 
         String uri = statefulRestTemplate.getUrl(PUBLICATIONS_PATH + publication.getId() + "/delete");
         HttpHeaders reqHeaders = statefulRestTemplate.getReqHeaders();
+
         ResponseEntity<String> response = statefulRestTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<Void>(reqHeaders), String.class);
         assertEquals(HttpStatus.OK,  response.getStatusCode());
 
+        assertNull(subscriptionRepository.findOne(subscription.getId()));
         assertNull(publicationRepository.findOne(publication.getId()));
     }
 

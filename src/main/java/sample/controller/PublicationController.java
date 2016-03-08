@@ -74,8 +74,9 @@ public class PublicationController {
 		
 		// remove all publication subscriptions
 		subscriptionRepository.deleteByPublication(publication);
-		
+
 		publicationRepository.delete(id);
+
 		response.sendRedirect("/publications/");
 	}
 
@@ -91,6 +92,7 @@ public class PublicationController {
 	}
 
 
+
 	@RequestMapping(value = "/publications/", method = RequestMethod.POST)
 	public ModelAndView updatePublication(@Valid Publication publication, BindingResult bindingResult,
 			@RequestParam("file") MultipartFile file,
@@ -101,13 +103,18 @@ public class PublicationController {
 			response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
 			return new ModelAndView("publication", "publication", publication);
 		}
+		// set current user is the publisher
+		publication.setPublisher(userService.getCurrentUser(activeUser));
+		storePublication(publication,file.getBytes());
 
-        // set current user is the publisher
-        publication.setPublisher(userService.getCurrentUser(activeUser));
-		publication = publicationRepository.save(publication);
-		fileService.storeFile(file.getBytes(), publication.getId());
 
 		return new ModelAndView("publication", "publication", new Publication());
+	}
+
+	@Transactional
+	void storePublication(@Valid Publication publication, byte[] content) throws IOException {
+		publication = publicationRepository.save(publication);
+		fileService.storeFile(content, publication.getId());
 	}
 
 }

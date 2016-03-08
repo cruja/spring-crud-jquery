@@ -29,7 +29,7 @@ public class PubsubscriptionTest {
     private PubsubscriptionService pubsubscriptionService;
 
     @Test
-    public void givenRepositoryWhenStoredThenPersisted() {
+    public void givenSubscriptionsWhenRequestedByPublicationIdThenReturned() {
 
         long pubId1 = (long) 1;
         long pubId2 = (long) 2;
@@ -41,9 +41,9 @@ public class PubsubscriptionTest {
         Subscription s2 = new Subscription((long)2, Subscription.Type.YEARLY, LocalDate.now(), null, pub2);
 
 
-        Map<Long, Subscription> userSubscriptionsByPubId = pubsubscriptionService.getSubscriptionsMapByPublicationId(Arrays.asList(s1, s2));
-        assertEquals(s1, userSubscriptionsByPubId.get(pubId1));
-        assertEquals(s2, userSubscriptionsByPubId.get(pubId2));
-        assertEquals(2, userSubscriptionsByPubId.size());
+        Map<Long, Subscription> subscriptionsByPubId = pubsubscriptionService.getSubscriptionsMapByPublicationId(Arrays.asList(s1, s2));
+        assertEquals(s1, subscriptionsByPubId.get(pubId1));
+        assertEquals(s2, subscriptionsByPubId.get(pubId2));
+        assertEquals(2, subscriptionsByPubId.size());
     }
 }

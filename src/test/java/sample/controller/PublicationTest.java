@@ -8,6 +8,9 @@ import org.springframework.boot.test.ConfigFileApplicationContextInitializer;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import sample.Application;
 import sample.model.Publication;
 import sample.model.User;
@@ -18,6 +21,8 @@ import sample.repository.SubscriptionRepository;
 import sample.repository.UserRepository;
 import sample.service.UserService;
 
+import javax.validation.Valid;
+import java.io.IOException;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -40,20 +45,17 @@ public class PublicationTest {
     @Autowired
 	private SubscriptionRepository subscriptionRepository;
 
+    User publisher = null;
 
-	String userEmail =  "newPublisher@gmail.com";
 
     @Before
 	public void setUp() {
 
-        userService.createUserIfNotExist( userEmail, "password", Role.PUBLISHER);
+        publisher = userService.createUserIfNotExist("newPublisherIT@gmail.com", "password", Role.PUBLISHER);
 	}
 
 	@Test
 	public void givenRepositoryWhenPublicationSavedThenPersisted() {
-
-
-		User publisher = userRepository.findByEmail(userEmail);
 
 		long publicationsCount = publicationRepository.count();
         Publication publication = new Publication(null, "pubTitle", "pubAuthor", 2015, publisher);
@@ -65,9 +67,6 @@ public class PublicationTest {
 
     @Test
     public void givenPublicationWhenDeletedThenRemoved() {
-
-
-        User publisher = userRepository.findByEmail(userEmail);
 
         long publicationsCount = publicationRepository.count();
         Publication publication = new Publication(null, "pubTitle", "pubAuthor", 2015, publisher);
@@ -81,8 +80,6 @@ public class PublicationTest {
 
     @Test
     public void givenPublicationWhenUpdatedThenPersisted() {
-
-        User publisher = userRepository.findByEmail(userEmail);
 
         Publication publication = new Publication(null, "pubTitle", "pubAuthor", 2015, publisher);
         publicationRepository.save(publication);
@@ -99,11 +96,18 @@ public class PublicationTest {
     @Test
     public void givenRepositoryWhenPublicationSavedThenPersistedForToUser() {
 
-        User publisher = userRepository.findByEmail(userEmail);
-
         Publication publication = new Publication(null, "pubTitle", "pubAuthor", 2015, publisher);
         publicationRepository.save(publication);
         Set<Publication> userPublications = publicationRepository.findByPublisher(publisher);
         assertTrue(userPublications.contains(publication));
+    }
+
+    @Test
+    void givenPublicationWhenStoredThenPersisted() throws IOException {
+        // set current user is the publisher
+        Publication publication = new Publication(null, "pubTitle", "pubAuthor", 2015, publisher);
+        publication = publicationRepository.save(publication);
+        //TODO test transaction!
+        fileService.storeFile(file.getBytes(), publication.getId());
     }
 }
