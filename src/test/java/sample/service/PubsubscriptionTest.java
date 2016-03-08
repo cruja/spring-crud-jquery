@@ -54,8 +54,8 @@ public class PubsubscriptionTest {
         Publication pub2 = new Publication(pubId2, "pub2", "anut2", 2001, null);
 
 
-        Subscription s1 = new Subscription((long)1, Subscription.Type.MONTHLY, LocalDate.now(), null, pub1);
-        Subscription s2 = new Subscription((long)2, Subscription.Type.YEARLY, LocalDate.now(), null, pub2);
+        Subscription s1 = new Subscription(null, Subscription.Type.MONTHLY, LocalDate.now(), null, pub1);
+        Subscription s2 = new Subscription(null, Subscription.Type.YEARLY, LocalDate.now(), null, pub2);
 
 
         Map<Long, Subscription> subscriptionsByPubId = pubsubscriptionService.getSubscriptionsMapByPublicationId(Arrays.asList(s1, s2));
@@ -92,7 +92,7 @@ public class PubsubscriptionTest {
         File file = new File(FileService.getPublicationLocalFileName(pubId1));
         file.setReadOnly();
 
-        // cleanup
+        // cleanup on exit
         file.deleteOnExit();
 
         byte[] contentModified = "sample modified content".getBytes();
@@ -105,7 +105,6 @@ public class PubsubscriptionTest {
             pub1.setTitle(originalTitle);
             assertEquals(pub1, publicationRepository.findOne(pubId1));
             assertArrayEquals(contentModified, fileService.getFileAsBytes(pubId1));
-
         }
 
 
